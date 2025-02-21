@@ -9,7 +9,9 @@ playground::LevelDbAccessor accessor{};
 
 namespace playground {
 bool UpdateCertificatePort::update(Certificate certificate) {
-  std::cout << "DB port가 호출되었습니다. Entity영속화를 위해 accessor를 호출합니다." << std::endl;
+  std::cout
+      << "DB port가 호출되었습니다. Entity영속화를 위해 accessor를 호출합니다."
+      << std::endl;
 
   // leveldb의 경우, 자체 codec이 들어있기 때문에 architecture별로 다르게 저장될
   // 염려는 없음 따라서 is_standard_layout으로 저장 대상 구조체의 직렬화 적합성

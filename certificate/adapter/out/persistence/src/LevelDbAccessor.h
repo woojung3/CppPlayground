@@ -12,8 +12,8 @@ public:
   std::string read(std::string key);
 
 private:
-  // not actually using leveldb
-  // fake leveldb accessor, which just uses inmemory db;
+  // leveldb 연동은 생략하였습니다
+  // 인메모리 DB로 대체하였습니다
   std::unordered_map<std::string, std::string> memory_db_;
 };
 } // namespace playground

@@ -18,7 +18,8 @@ int AddCertificateUseCase::AddCertificate(std::string cert) {
   Certificate certificate{cert};
   port.update(certificate);
 
-  std::cout << "모든 작업이 완료되었습니다. inport로 응답을 내보냅니다." << std::endl;
+  std::cout << "모든 작업이 완료되었습니다. inport로 응답을 내보냅니다."
+            << std::endl;
 
   return certificate.isValid();
 }

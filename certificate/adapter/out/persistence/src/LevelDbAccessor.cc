@@ -13,8 +13,7 @@ bool LevelDbAccessor::update(std::string key, std::string value) {
 }
 
 std::string LevelDbAccessor::read(std::string key) {
-  // need to add exception handling logic
-  // omitted (for demonstration purpose)
+  // 예외처리 로직은 생략하였습니다
   return this->memory_db_[key];
 }
 } // namespace playground
