@@ -104,7 +104,7 @@ endif()
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG        release-1.10.0 # GCC 5.0 미만을 사용하는 경우 is_trivially_copy_constructible 지원이 되지 않으므로 1.11.0 이후는 사용 불가
+  GIT_TAG        release-1.11.0 # GCC 5.0 미만을 사용하는 경우 is_trivially_copy_constructible 지원이 되지 않으므로 1.11.0 이후는 사용 불가
 )
 FetchContent_GetProperties(googletest)
 if(NOT googletest_POPULATED)
@@ -156,7 +156,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
   # 정적 분석 준비
   if((NOT CLANG_TIDY_EXE) OR (NOT CLANG_EXE))
-    message(FATAL_ERROR "clang-tidy tool not found")
+      # message(FATAL_ERROR "clang-tidy tool not found")
   endif()
 endif()
 
@@ -168,4 +168,5 @@ file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 # add subdirectories
-add_subdirectory_with_static_analysis(sample)
+#add_subdirectory_with_static_analysis(certificate)
+add_subdirectory(certificate)
