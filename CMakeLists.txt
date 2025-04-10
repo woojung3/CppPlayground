@@ -22,9 +22,9 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/module" ${CMAKE_MODULE_
 message(STATUS "${CMAKE_MODULE_PATH}")
 
 # 프로젝트 이름과 몇가지 유용한 설정
-project(playground VERSION 1.0.0
-                   DESCRIPTION "V2X Playground"
-                   LANGUAGES C CXX)
+project(keco VERSION 1.0.0
+    DESCRIPTION "KECO ECDHE Sample"
+    LANGUAGES C CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # LSP support
 
@@ -71,21 +71,10 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif()
 
-# cmake 모듈 include
-include(V2XClangTidyFlags)
-
 ##################
 # 의존성 가져오기 #
 ##################
 include(FetchContent)
-FetchContent_Declare(json
-  GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG v3.10.4)
-FetchContent_GetProperties(json)
-if(NOT json_POPULATED)
-  FetchContent_Populate(json)
-  add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
-endif()
 
 FetchContent_Declare(
   spdlog
@@ -111,29 +100,6 @@ if(NOT googletest_POPULATED)
   FetchContent_Populate(googletest)
   set(gtest_build_tests OFF CACHE BOOL "Enable gtest tests" FORCE)
   add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
-endif()
-
-FetchContent_Declare(
-  googlebenchmark
-  GIT_REPOSITORY https://github.com/google/benchmark
-  GIT_TAG        v1.5.3
-)
-FetchContent_GetProperties(googlebenchmark)
-if(NOT googlebenchmark_POPULATED)
-  FetchContent_Populate(googlebenchmark)
-  set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Enable gbench tests" FORCE)
-  add_subdirectory(${googlebenchmark_SOURCE_DIR} ${googlebenchmark_BINARY_DIR} EXCLUDE_FROM_ALL)
-endif()
-
-FetchContent_Declare(
-  cxxopts
-  GIT_REPOSITORY https://github.com/jarro2783/cxxopts
-  GIT_TAG        v3.0.0
-)
-FetchContent_GetProperties(cxxopts)
-if(NOT cxxopts_POPULATED)
-  FetchContent_Populate(cxxopts)
-  add_subdirectory(${cxxopts_SOURCE_DIR} ${cxxopts_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
 #####################
@@ -168,5 +134,4 @@ file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 # add subdirectories
-#add_subdirectory_with_static_analysis(certificate)
-add_subdirectory(certificate)
+add_subdirectory(sample)
