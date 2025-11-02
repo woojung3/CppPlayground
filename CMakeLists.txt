@@ -168,5 +168,4 @@ file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 # add subdirectories
-#add_subdirectory_with_static_analysis(certificate)
-add_subdirectory(certificate)
+add_subdirectory(game)
