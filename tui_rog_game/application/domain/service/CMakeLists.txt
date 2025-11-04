@@ -19,8 +19,8 @@ target_include_directories(domain_service
 target_link_libraries(domain_service
     PRIVATE
         tui_rog_game::domain::model
+        tui_rog_game::domain::event
         tui_rog_game::port::in
         tui_rog_game::port::out
-        tui_rog_game::common
         spdlog::spdlog
 )

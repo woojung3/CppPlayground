@@ -1,6 +1,6 @@
-## **TUI-ROG: AI Dungeon Master 프로젝트 계획 (v2)**
+## **TUI-ROG: AI Dungeon Master 프로젝트 계획**
 
-### 1. TUI-ROG 게임 기획 (v2)
+### 1. TUI-ROG 게임 기획
 
 **컨셉:** 플레이어가 절차적으로 생성된 던전을 탐험하는 싱글 플레이어 로그라이크. 각 장소의 묘사는 AI(ChatGPT)가 실시간으로 생성하여, 매번 새로운 탐험 경험을 제공한다.
 
@@ -23,7 +23,7 @@
 *   **AI 연동:** 플레이어가 새로운 바닥(`.`) 타일로 이동할 때마다, 해당 위치의 특징(주변 타일 등)을 기반으로 AI가 장소에 대한 문학적 묘사를 생성하여 메시지 로그에 출력한다.
 *   **영속성:** 플레이어의 턴(행동) 종료 시마다 **자동 저장**하여 강제 종료 시에도 복구 가능.
 
-### 2. 아키텍처 계획 (v2)
+### 2. 아키텍처 계획
 
 *   **Core (도메인 계층):**
     *   `GameEngine`: 게임의 모든 규칙과 상태를 관리. **행동의 결과로 `List<DomainEvent>`를 반환.**
@@ -46,7 +46,7 @@
     *   `LevelDBAdapter`: `IPersistence`를 구현. **LevelDB**에 게임 상태를 저장.
     *   `InMemoryAdapter`: `IPersistence`를 구현. `std::map` 같은 메모리 내 객체에 게임 상태를 임시 저장 (테스트 및 시연용).
 
-### 3. 기술 스택 (v2)
+### 3. 기술 스택
 
 *   **언어:** C++17
 *   **빌드 시스템:** CMake
@@ -55,30 +55,59 @@
 *   **Persistence:** LevelDB
 *   **패키지 매니저 (macOS):** Homebrew
 
-### 4. 개발 단계 (v2)
+### 4. 완료된 항목
 
-*   **0단계: 프로젝트 환경 설정**
-    1.  Git 저장소 초기화 및 `PLAN.md` 파일 생성.
-    2.  `CMakeLists.txt` 기본 구조 작성.
-    3.  CMake의 `FetchContent`를 사용하여 FTXUI, cpp-httplib, nlohmann/json 라이브러리 자동 연동 설정.
-    4.  Homebrew로 설치한 LevelDB를 CMake에서 찾아 링크하도록 설정.
-    5.  FTXUI를 사용한 "Hello TUI-ROG"를 화면에 띄워 모든 라이브러리 설정이 완료되었는지 검증.
+-   **[완료] 0단계: 프로젝트 환경 설정**
+    -   Git 저장소 초기화 및 `PLAN.md` 파일 생성
+    -   `CMakeLists.txt` 기본 구조 및 디렉토리 구조 완성
+    -   CMake의 `FetchContent`를 사용한 라이브러리 연동 설정
+    -   LevelDB 연동 설정
+    -   Port & Adapter 아키텍처 기반 코드 구조 완성 (`main.cc`에서 의존성 주입 확인)
 
-*   **1단계: 기본 게임 루프 및 전투 구현**
-    1.  `GameEngine`과 핵심 엔티티(`Player`, `Enemy`), 값 객체(`Stats`) 정의.
-    2.  `TUIAdapter`로 맵, 플레이어, 적을 화면에 렌더링.
-    3.  플레이어 이동 및 **간단한 턴제 전투 로직** 구현. `GameEngine`이 `DomainEvent`를 반환하고, `TUIAdapter`가 이를 출력하는 구조 완성.
+-   **[완료] 1단계: 기본 게임 루프 및 전투 구현**
+    -   `GameEngine`과 핵심 엔티티(`Player`, `Enemy`), 값 객체(`Stats`) 정의
+    -   `TuiAdapter`가 사용자 입력을 받아 `GameEngine`에 전달하는 기본 루프 구현
+    -   `GameEngine` 내 플레이어 이동 로직 구현 (`processPlayerMove`)
+    -   `DomainEvent` 시스템 완성 (플레이어 이동 이벤트 생성 및 `TuiAdapter`를 통한 화면 갱신, 초기 위치 렌더링 포함)
 
-*   **2단계: 성장 및 AI 연동**
-    1.  전투 후 XP 획득 및 레벨업 시스템 구현.
-    2.  `IDescriptionGenerator` 포트 및 어댑터들(`ChatGPT`, `Hardcoded`) 구현 및 연동.
+-   **[부분 완료] 2단계: 성장 및 AI 연동**
+    -   `IDescriptionGenerator` 포트 및 어댑터들(`ChatGPT`, `Hardcoded`) 구현 및 `GameEngine`에 연결 완료
 
-*   **3단계: 아이템 및 영속성 구현**
-    1.  아이템 획득 및 사용 기능 구현.
-    2.  `IPersistence` 포트 및 `LevelDBAdapter` 구현.
-    3.  **턴 종료 시 자동 저장** 로직 추가.
+-   **[부분 완료] 3단계: 아이템 및 영속성 구현**
+    -   `IPersistence` 포트 및 어댑터들(`LevelDB`, `InMemory`) 구현 및 `GameEngine`에 연결 완료
 
-*   **4단계: 발표를 위한 최종 다듬기**
-    1.  TUI 레이아웃 개선.
-    2.  게임 시작 화면, 조작법 안내 등 추가.
-    3.  발표의 하이라이트가 될 '어댑터 교체' 시연 부분을 집중적으로 연습.
+---
+
+### 5. 앞으로 해야 할 일 (개발 순서)
+
+1.  **맵(`Map`) 구현 및 렌더링**
+    -   절차적으로 맵을 생성하는 로직 구현
+    -   `TuiAdapter`에서 현재 `Map` 상태와 `Player` 위치를 함께 렌더링하도록 구현
+    -   플레이어가 벽(`_`)으로 이동하지 못하도록 `GameEngine`에 충돌 감지 로직 추가
+
+2.  **전투 시스템 구현**
+    -   `GameEngine`에 간단한 턴제 전투 로직 구현 (`handlePlayerAction`의 `ATTACK` 케이스)
+    -   전투 발생 시 `CombatStarted`, `PlayerAttacked`, `EnemyAttacked` 등 관련 `DomainEvent` 생성
+    -   `TuiAdapter`가 전투 관련 이벤트를 수신하여 전투 상황을 메시지 로그에 출력
+
+3.  **성장 시스템 구현**
+    -   전투 승리 시 XP 획득 및 레벨업 시스템 구현 (`PlayerLeveledUp` 이벤트 생성)
+    -   `TuiAdapter`가 `PlayerLeveledUp` 이벤트를 수신하여 상태 바(Status Bar)의 레벨 정보를 갱신
+
+4.  **AI 연동 기능 활성화**
+    -   플레이어가 새로운 타일로 이동했을 때(`PlayerMoved` 이벤트 발생 시), `GameEngine`이 `description_port_`를 호출하여 장소 묘사를 얻어오도록 구현
+    -   가져온 묘사를 `DescriptionGenerated` 같은 새로운 `DomainEvent`로 만들어 `TuiAdapter`에 전달
+    -   `TuiAdapter`는 `DescriptionGenerated` 이벤트를 수신하여 메시지 로그에 묘사를 출력
+
+5.  **아이템 시스템 구현**
+    -   맵에 아이템을 배치하고, 플레이어가 획득/사용하는 기능 구현 (`ItemFound`, `ItemUsed` 이벤트)
+    -   `TuiAdapter`가 관련 이벤트를 처리하여 인벤토리 및 메시지 로그를 갱신
+
+6.  **영속성 기능 활성화**
+    -   플레이어의 턴이 끝날 때마다(`handlePlayerAction` 처리 완료 후), `GameEngine`이 `persistence_port_`를 호출하여 현재 게임 상태를 저장하도록 구현 (자동 저장)
+    -   게임 시작 시 `persistence_port_`를 통해 저장된 게임을 불러오는 로직 추가
+
+7.  **최종 다듬기**
+    -   TUI 레이아웃 개선 (맵 뷰, 메시지 로그, 상태 바)
+    -   게임 시작 화면, 조작법 안내 등 추가
+    -   `HardcodedDescAdapter`와 `ChatGPTAdapter`를 쉽게 교체하며 시연할 수 있도록 준비

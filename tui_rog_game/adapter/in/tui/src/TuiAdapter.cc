@@ -1,4 +1,5 @@
 #include "TuiAdapter.h"
+#include "PlayerMovedEvent.h"
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/event.hpp>
@@ -25,8 +26,8 @@ void restore_terminal_settings() {
     }
 }
 
-TuiAdapter::TuiAdapter(Port::In::IGetPlayerActionUseCase& game_engine)
-    : game_engine_(game_engine) {
+TuiAdapter::TuiAdapter(Port::In::IGetPlayerActionUseCase& game_engine, ftxui::ScreenInteractive& screen)
+    : game_engine_(game_engine), screen_(screen), player_position_({0, 0}) { // Initialize player_position_
     spdlog::info("TuiAdapter initialized.");
 }
 
@@ -34,14 +35,13 @@ void TuiAdapter::run() {
     spdlog::info("TuiAdapter::run() started.");
     using namespace ftxui;
 
-    auto screen = ScreenInteractive::TerminalOutput();
-
     // This will be the main component that renders the game UI.
     auto renderer = Renderer([&] {
         // For now, just a placeholder. Later, this will render the map, player, stats, etc.
         return vbox({
             text("TUI-ROG Game Window"),
             text("Press 'q' to quit."),
+            text("Player Position: (" + std::to_string(player_position_.x) + ", " + std::to_string(player_position_.y) + ")"),
         });
     });
 
@@ -61,7 +61,7 @@ void TuiAdapter::run() {
                 command = TuiRogGame::Port::In::PlayerActionCommand(TuiRogGame::Port::In::PlayerActionCommand::MOVE_RIGHT);
             } else if (event.character() == "q") {
                 command = TuiRogGame::Port::In::PlayerActionCommand(TuiRogGame::Port::In::PlayerActionCommand::QUIT);
-                screen.Exit(); // Exit the FTXUI loop
+                screen_.Exit(); // Exit the FTXUI loop
             }
             // Pass the command to the game engine
             game_engine_.handlePlayerAction(command);
@@ -70,7 +70,7 @@ void TuiAdapter::run() {
         return false;
     });
 
-    screen.Loop(component);
+    screen_.Loop(component);
 
     // Explicitly restore terminal settings after the FTXUI loop exits.
     restore_terminal_settings();
@@ -78,14 +78,19 @@ void TuiAdapter::run() {
     spdlog::info("TuiAdapter::run() exited.");
 }
 
-void TuiAdapter::render(const std::vector<std::unique_ptr<Common::DomainEvent>>& events) {
+void TuiAdapter::render(const std::vector<std::unique_ptr<Domain::Event::DomainEvent>>& events) {
     spdlog::info("TuiAdapter::render() called with {} events.", events.size());
     for (const auto& event : events) {
-        // For now, just log the event. Later, this will trigger UI updates.
         spdlog::info("  - Event: {}", event->toString());
+        if (event->getType() == Domain::Event::DomainEvent::Type::PlayerMoved) {
+            const Domain::Event::PlayerMovedEvent* player_moved_event = dynamic_cast<const Domain::Event::PlayerMovedEvent*>(event.get());
+            if (player_moved_event) {
+                player_position_ = player_moved_event->getNewPosition();
+                spdlog::info("TuiAdapter: PlayerMovedEvent received. New position: ({}, {}).", player_position_.x, player_position_.y);
+                screen_.PostEvent(ftxui::Event::Custom); // Request a repaint
+            }
+        }
     }
-    // In a real FTXUI app, you would typically call screen.PostEvent(Event::Custom)
-    // to trigger a repaint in a thread-safe way.
 }
 
 } // namespace Tui

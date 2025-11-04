@@ -4,7 +4,8 @@
 #include <memory>
 
 namespace TuiRogGame {
-namespace Common {
+namespace Domain {
+namespace Event {
 
 // Base class for all domain events
 class DomainEvent {
@@ -28,5 +29,6 @@ public:
     virtual std::string toString() const = 0; // Pure virtual function for string representation (e.g., for logging/display)
 };
 
-} // namespace Common
+} // namespace Event
+} // namespace Domain
 } // namespace TuiRogGame

@@ -20,7 +20,7 @@ target_link_libraries(tui_adapter
     PRIVATE
         tui_rog_game::port::in
         tui_rog_game::port::out
-        tui_rog_game::common
+        tui_rog_game::domain::event
         spdlog::spdlog
     PUBLIC
         ftxui::screen

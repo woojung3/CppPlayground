@@ -32,9 +32,10 @@ public:
     void handlePlayerAction(const TuiRogGame::Port::In::PlayerActionCommand& command) override;
 
 private:
-    void initializeGame();
-    std::vector<std::unique_ptr<TuiRogGame::Common::DomainEvent>> processPlayerMove(int dx, int dy);
-    void processEvents(const std::vector<std::unique_ptr<TuiRogGame::Common::DomainEvent>>& events);
+    // Initializes the game state (player, map, etc.) and returns initial events.
+    std::vector<std::unique_ptr<Domain::Event::DomainEvent>> initializeGame();
+    std::vector<std::unique_ptr<TuiRogGame::Domain::Event::DomainEvent>> processPlayerMove(int dx, int dy);
+    void processEvents(const std::vector<std::unique_ptr<TuiRogGame::Domain::Event::DomainEvent>>& events);
 
     TuiRogGame::Port::Out::IRenderPort* render_port_ = nullptr;
     std::unique_ptr<TuiRogGame::Port::Out::IPersistencePort> persistence_port_;

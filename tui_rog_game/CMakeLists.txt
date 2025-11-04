@@ -10,6 +10,7 @@ add_subdirectory(adapter/in/tui)
 add_subdirectory(adapter/out/persistence)
 add_subdirectory(adapter/out/description)
 add_subdirectory(application/domain/model)
+add_subdirectory(application/domain/event)
 add_subdirectory(application/domain/service)
 add_subdirectory(application/port/in)
 add_subdirectory(application/port/out)
@@ -107,10 +108,10 @@ target_link_libraries(tui_rog_game
         persistence_adapter
         description_adapter
         domain_model
+        domain_event
         domain_service
         port_in
         port_out
-        common_lib
     # External libs will be linked below
 )
 
@@ -129,6 +130,7 @@ target_include_directories(tui_rog_game PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/adapter/out/persistence/include
     ${CMAKE_CURRENT_SOURCE_DIR}/adapter/out/description/include
     ${CMAKE_CURRENT_SOURCE_DIR}/application/domain/model/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/application/domain/event/include
     ${CMAKE_CURRENT_SOURCE_DIR}/application/domain/service/include
     ${CMAKE_CURRENT_SOURCE_DIR}/application/port/in/include
     ${CMAKE_CURRENT_SOURCE_DIR}/application/port/out/include

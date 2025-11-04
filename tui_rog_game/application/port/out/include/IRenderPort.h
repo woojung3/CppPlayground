@@ -17,7 +17,7 @@ namespace TuiRogGame {
                 virtual ~IRenderPort() = default;
 
                 // Pure virtual function to render the current game state based on a list of domain events.
-                virtual void render(const std::vector<std::unique_ptr<Common::DomainEvent>>& events) = 0;
+                virtual void render(const std::vector<std::unique_ptr<Domain::Event::DomainEvent>>& events) = 0;
             };
 
         } // namespace Out

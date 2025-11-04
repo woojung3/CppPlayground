@@ -19,8 +19,5 @@ target_include_directories(domain_model
         src
 )
 
-# common 모듈에 의존합니다.
 target_link_libraries(domain_model
-    PRIVATE
-        tui_rog_game::common
 )
