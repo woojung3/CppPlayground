@@ -3,7 +3,8 @@
 
 #include <vector>
 #include <memory> // For std::unique_ptr
-#include "DomainEvent.h" // Include the DomainEvent definition
+#include "DomainEvent.h"
+#include "GameStateDTO.h"
 
 namespace TuiRogGame {
     namespace Port {
@@ -16,8 +17,9 @@ namespace TuiRogGame {
             public:
                 virtual ~IRenderPort() = default;
 
-                // Pure virtual function to render the current game state based on a list of domain events.
-                virtual void render(const std::vector<std::unique_ptr<Domain::Event::DomainEvent>>& events) = 0;
+                // Renders the current game state. It receives the full game state DTO
+                // and a list of events that led to this state change.
+                virtual void render(const GameStateDTO& game_state, const std::vector<std::unique_ptr<Domain::Event::DomainEvent>>& events) = 0;
             };
 
         } // namespace Out

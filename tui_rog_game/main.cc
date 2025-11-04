@@ -25,10 +25,8 @@ int main() {
     // 4. Now, connect the GameEngine to the TuiAdapter (setter injection).
     game_engine->setRenderPort(&tui_adapter);
 
-    // Initialize the GameEngine (creates player, etc.)
-    game_engine->run();
-
     // 5. Start the TuiAdapter's game loop, which is the main application loop.
+    // The adapter will send an INITIALIZE command to the engine to start the game.
     tui_adapter.run();
 
     return 0;

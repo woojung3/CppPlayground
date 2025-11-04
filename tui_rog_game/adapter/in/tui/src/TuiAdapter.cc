@@ -1,33 +1,34 @@
 #include "TuiAdapter.h"
 #include "PlayerMovedEvent.h"
+#include "Map.h"
+#include "Player.h"
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/event.hpp>
+#include <ftxui/dom/elements.hpp>
 #include <spdlog/spdlog.h>
-#include <thread> // For std::this_thread::sleep_for
-#include <chrono> // For std::chrono::milliseconds
-#include <termios.h> // For tcgetattr, tcsetattr
-#include <unistd.h>  // For STDIN_FILENO
+#include <vector>
+#include <string>
 
 namespace TuiRogGame {
 namespace Adapter {
 namespace In {
 namespace Tui {
 
-// Helper function to explicitly restore terminal settings
-void restore_terminal_settings() {
-    struct termios term;
-    if (tcgetattr(STDIN_FILENO, &term) == 0) {
-        term.c_lflag |= (ICANON | ECHO); // Re-enable canonical mode and echoing
-        tcsetattr(STDIN_FILENO, TCSANOW, &term);
-        spdlog::info("Terminal settings explicitly restored.");
-    } else {
-        spdlog::warn("Failed to get terminal attributes for restoration.");
+// Helper to convert domain Tile to ftxui Element
+ftxui::Element TileToElement(Domain::Model::Tile tile) {
+    switch (tile) {
+        case Domain::Model::Tile::WALL:  return ftxui::text("#") | ftxui::color(ftxui::Color::GrayDark);
+        case Domain::Model::Tile::FLOOR: return ftxui::text(".") | ftxui::color(ftxui::Color::GrayLight);
+        case Domain::Model::Tile::EXIT:  return ftxui::text(">") | ftxui::color(ftxui::Color::Yellow);
+        case Domain::Model::Tile::ENEMY: return ftxui::text("E") | ftxui::color(ftxui::Color::Red);
+        case Domain::Model::Tile::ITEM:  return ftxui::text("I") | ftxui::color(ftxui::Color::Green);
+        default: return ftxui::text("?");
     }
 }
 
 TuiAdapter::TuiAdapter(Port::In::IGetPlayerActionUseCase& game_engine, ftxui::ScreenInteractive& screen)
-    : game_engine_(game_engine), screen_(screen), player_position_({0, 0}) { // Initialize player_position_
+    : game_engine_(game_engine), screen_(screen), game_state_ptr_(std::make_shared<std::optional<Port::Out::GameStateDTO>>(std::nullopt)) {
     spdlog::info("TuiAdapter initialized.");
 }
 
@@ -35,62 +36,69 @@ void TuiAdapter::run() {
     spdlog::info("TuiAdapter::run() started.");
     using namespace ftxui;
 
-    // This will be the main component that renders the game UI.
-    auto renderer = Renderer([&] {
-        // For now, just a placeholder. Later, this will render the map, player, stats, etc.
-        return vbox({
-            text("TUI-ROG Game Window"),
-            text("Press 'q' to quit."),
-            text("Player Position: (" + std::to_string(player_position_.x) + ", " + std::to_string(player_position_.y) + ")"),
+    auto renderer = Renderer([=] {
+        if (!game_state_ptr_->has_value()) {
+            return text("Initializing...");
+        }
+
+        const auto& state = game_state_ptr_->value();
+        const auto& map = state.map;
+        const auto& player = state.player;
+
+        std::vector<Element> rows_elements;
+        for (int y = 0; y < map.getHeight(); ++y) {
+            Elements row_chars;
+            for (int x = 0; x < map.getWidth(); ++x) {
+                if (player.getPosition().x == x && player.getPosition().y == y) {
+                    row_chars.push_back(text("@") | color(Color::Blue));
+                } else {
+                    row_chars.push_back(TileToElement(map.getTile(x, y)));
+                }
+            }
+            rows_elements.push_back(hbox(row_chars));
+        }
+        auto map_view = vbox(rows_elements);
+
+        auto stats_view = vbox({
+            text("Player Stats"),
+            text("HP: " + std::to_string(player.getHp())),
+            text("Level: " + std::to_string(player.getLevel())),
+            text("XP: " + std::to_string(player.getXp())),
         });
+
+        return hbox({map_view, separator(), stats_view});
     });
 
-    // Capture keyboard events.
     auto component = CatchEvent(renderer, [&](Event event) {
         if (event.is_character()) {
-            spdlog::info("TuiAdapter: Caught character event: {}", event.character());
-            // Create a PlayerActionCommand from the event
-            TuiRogGame::Port::In::PlayerActionCommand command(TuiRogGame::Port::In::PlayerActionCommand::UNKNOWN);
-            if (event.character() == "w") {
-                command = TuiRogGame::Port::In::PlayerActionCommand(TuiRogGame::Port::In::PlayerActionCommand::MOVE_UP);
-            } else if (event.character() == "s") {
-                command = TuiRogGame::Port::In::PlayerActionCommand(TuiRogGame::Port::In::PlayerActionCommand::MOVE_DOWN);
-            } else if (event.character() == "a") {
-                command = TuiRogGame::Port::In::PlayerActionCommand(TuiRogGame::Port::In::PlayerActionCommand::MOVE_LEFT);
-            } else if (event.character() == "d") {
-                command = TuiRogGame::Port::In::PlayerActionCommand(TuiRogGame::Port::In::PlayerActionCommand::MOVE_RIGHT);
-            } else if (event.character() == "q") {
-                command = TuiRogGame::Port::In::PlayerActionCommand(TuiRogGame::Port::In::PlayerActionCommand::QUIT);
-                screen_.Exit(); // Exit the FTXUI loop
+            Port::In::PlayerActionCommand command(Port::In::PlayerActionCommand::UNKNOWN);
+            char input = event.character()[0];
+            switch (input) {
+                case 'w': command = Port::In::PlayerActionCommand(Port::In::PlayerActionCommand::MOVE_UP); break;
+                case 's': command = Port::In::PlayerActionCommand(Port::In::PlayerActionCommand::MOVE_DOWN); break;
+                case 'a': command = Port::In::PlayerActionCommand(Port::In::PlayerActionCommand::MOVE_LEFT); break;
+                case 'd': command = Port::In::PlayerActionCommand(Port::In::PlayerActionCommand::MOVE_RIGHT); break;
+                case 'q': screen_.Exit(); return true;
             }
-            // Pass the command to the game engine
             game_engine_.handlePlayerAction(command);
-            return true; // Signal that the event has been handled.
+            return true;
         }
         return false;
     });
 
+    // Send initialize command to load initial game state
+    game_engine_.handlePlayerAction(Port::In::PlayerActionCommand(Port::In::PlayerActionCommand::INITIALIZE));
+
     screen_.Loop(component);
-
-    // Explicitly restore terminal settings after the FTXUI loop exits.
-    restore_terminal_settings();
-
     spdlog::info("TuiAdapter::run() exited.");
 }
 
-void TuiAdapter::render(const std::vector<std::unique_ptr<Domain::Event::DomainEvent>>& events) {
-    spdlog::info("TuiAdapter::render() called with {} events.", events.size());
-    for (const auto& event : events) {
-        spdlog::info("  - Event: {}", event->toString());
-        if (event->getType() == Domain::Event::DomainEvent::Type::PlayerMoved) {
-            const Domain::Event::PlayerMovedEvent* player_moved_event = dynamic_cast<const Domain::Event::PlayerMovedEvent*>(event.get());
-            if (player_moved_event) {
-                player_position_ = player_moved_event->getNewPosition();
-                spdlog::info("TuiAdapter: PlayerMovedEvent received. New position: ({}, {}).", player_position_.x, player_position_.y);
-                screen_.PostEvent(ftxui::Event::Custom); // Request a repaint
-            }
-        }
-    }
+void TuiAdapter::render(const Port::Out::GameStateDTO& game_state, const std::vector<std::unique_ptr<Domain::Event::DomainEvent>>& events) {
+    // This method is called from the GameEngine thread.
+    // To update the UI, we use emplace to construct a new GameStateDTO in the optional
+    // and then post an event to the UI thread.
+    game_state_ptr_->emplace(game_state);
+    screen_.PostEvent(ftxui::Event::Custom);
 }
 
 } // namespace Tui

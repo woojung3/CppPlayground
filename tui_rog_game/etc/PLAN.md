@@ -11,9 +11,9 @@
 *   **적 (`Enemy` Entity):** `Orc`, `Goblin` 등. 각각 다른 `stats`를 가짐.
 *   **아이템 (`Item` Entity/Value Object):** `HealthPotion`, `StrengthScroll` 등 소모성 아이템.
 *   **맵:** 2차원 배열로 구현된 던전.
-    *   타일 종류: 벽(`#`), 바닥(`.`), 출구(`>`).
-    *   게임 시작 시 간단한 알고리즘으로 맵을 절차적으로 생성한다.
-*   **전투:** 새 타일 이동 시 확률적으로 Random Encounter. 턴제 전투.
+    *   타일 종류: 벽(`#`), 바닥(`.`), 출구(`>`), 적(`E`), 아이템(`I`).
+    *   게임 시작 시 간단한 알고리즘으로 맵을 절차적으로 생성하며, 적과 아이템을 특정 위치에 배치한다.
+*   **전투:** 맵에 배치된 적(`E`) 타일로 이동 시 턴제 전투가 시작된다.
 *   **성장:** 전투 승리 시 XP 획득, 레벨업 시 `stats` 성장.
 *   **패배:** HP 0 이하 시 `PlayerDied` 이벤트 발생, 맵 시작 지점에서 부활.
 *   **UI (TUI):**
@@ -58,56 +58,45 @@
 ### 4. 완료된 항목
 
 -   **[완료] 0단계: 프로젝트 환경 설정**
-    -   Git 저장소 초기화 및 `PLAN.md` 파일 생성
-    -   `CMakeLists.txt` 기본 구조 및 디렉토리 구조 완성
-    -   CMake의 `FetchContent`를 사용한 라이브러리 연동 설정
-    -   LevelDB 연동 설정
-    -   Port & Adapter 아키텍처 기반 코드 구조 완성 (`main.cc`에서 의존성 주입 확인)
-
--   **[완료] 1단계: 기본 게임 루프 및 전투 구현**
-    -   `GameEngine`과 핵심 엔티티(`Player`, `Enemy`), 값 객체(`Stats`) 정의
-    -   `TuiAdapter`가 사용자 입력을 받아 `GameEngine`에 전달하는 기본 루프 구현
-    -   `GameEngine` 내 플레이어 이동 로직 구현 (`processPlayerMove`)
-    -   `DomainEvent` 시스템 완성 (플레이어 이동 이벤트 생성 및 `TuiAdapter`를 통한 화면 갱신, 초기 위치 렌더링 포함)
-
+-   **[완료] 1단계: 기본 게임 루프 및 `DomainEvent` 시스템 완성**
 -   **[부분 완료] 2단계: 성장 및 AI 연동**
-    -   `IDescriptionGenerator` 포트 및 어댑터들(`ChatGPT`, `Hardcoded`) 구현 및 `GameEngine`에 연결 완료
-
 -   **[부분 완료] 3단계: 아이템 및 영속성 구현**
-    -   `IPersistence` 포트 및 어댑터들(`LevelDB`, `InMemory`) 구현 및 `GameEngine`에 연결 완료
 
 ---
 
 ### 5. 앞으로 해야 할 일 (개발 순서)
 
-1.  **맵(`Map`) 구현 및 렌더링**
-    -   절차적으로 맵을 생성하는 로직 구현
-    -   `TuiAdapter`에서 현재 `Map` 상태와 `Player` 위치를 함께 렌더링하도록 구현
-    -   플레이어가 벽(`_`)으로 이동하지 못하도록 `GameEngine`에 충돌 감지 로직 추가
+1.  **맵(`Map`) 시스템 확장 및 구현**
+    -   `Tile` 종류에 적(`ENEMY`), 아이템(`ITEM`)을 추가하고, 이를 나타내는 문자(e.g., `E`, `I`) 정의.
+    -   `Map` 모델에 `Enemy`와 `Item` 객체들을 특정 위치에 저장하는 구조 추가 (e.g., `std::map<Position, Enemy>`).
+    -   절차적으로 맵을 생성하고, 적과 아이템을 특정 위치에 배치하는 로직 구현.
+    -   `TuiAdapter`가 `Map`을 렌더링할 때, 플레이어(`@`), 적(`E`), 아이템(`I`) 등을 문자로 표시하도록 구현.
+    -   `GameEngine`의 이동 로직(`processPlayerMove`) 수정:
+        -   벽 충돌 감지 로직 추가.
+        -   새로운 타일로 이동 시, 해당 타일에 적이나 아이템이 있는지 확인.
+        -   적이 있으면 `CombatStarted` 이벤트 생성.
+        -   아이템이 있으면 `ItemFound` 이벤트 생성하고 맵에서 아이템 제거.
 
-2.  **전투 시스템 구현**
-    -   `GameEngine`에 간단한 턴제 전투 로직 구현 (`handlePlayerAction`의 `ATTACK` 케이스)
-    -   전투 발생 시 `CombatStarted`, `PlayerAttacked`, `EnemyAttacked` 등 관련 `DomainEvent` 생성
-    -   `TuiAdapter`가 전투 관련 이벤트를 수신하여 전투 상황을 메시지 로그에 출력
+2.  **전투 및 아이템 시스템 구현**
+    -   `GameEngine`에 `CombatStarted` 이벤트에 따른 턴제 전투 로직 구현 (`handlePlayerAction`의 `ATTACK` 케이스).
+    -   `GameEngine`에 `ItemFound` 이벤트에 따른 아이템 획득 로직 구현 (플레이어 인벤토리에 추가).
+    -   `TuiAdapter`가 `CombatStarted`, `ItemFound`, `PlayerAttacked`, `EnemyDefeated` 등의 이벤트를 수신하여 UI(메시지 로그, 상태 바 등)를 업데이트하도록 구현.
+    -   플레이어의 아이템 사용 기능(`UseItem` 커맨드) 및 관련 로직 구현.
 
 3.  **성장 시스템 구현**
-    -   전투 승리 시 XP 획득 및 레벨업 시스템 구현 (`PlayerLeveledUp` 이벤트 생성)
-    -   `TuiAdapter`가 `PlayerLeveledUp` 이벤트를 수신하여 상태 바(Status Bar)의 레벨 정보를 갱신
+    -   전투 승리 시 XP 획득 및 레벨업 시스템 구현 (`PlayerLeveledUp` 이벤트 생성).
+    -   `TuiAdapter`가 `PlayerLeveledUp` 이벤트를 수신하여 상태 바(Status Bar)의 레벨 정보를 갱신.
 
 4.  **AI 연동 기능 활성화**
-    -   플레이어가 새로운 타일로 이동했을 때(`PlayerMoved` 이벤트 발생 시), `GameEngine`이 `description_port_`를 호출하여 장소 묘사를 얻어오도록 구현
-    -   가져온 묘사를 `DescriptionGenerated` 같은 새로운 `DomainEvent`로 만들어 `TuiAdapter`에 전달
-    -   `TuiAdapter`는 `DescriptionGenerated` 이벤트를 수신하여 메시지 로그에 묘사를 출력
+    -   플레이어가 새로운 바닥(`.`) 타일로 이동했을 때(`PlayerMoved` 이벤트 발생 시), `GameEngine`이 `description_port_`를 호출하여 장소 묘사를 얻어오도록 구현.
+    -   가져온 묘사를 `DescriptionGenerated` 같은 새로운 `DomainEvent`로 만들어 `TuiAdapter`에 전달.
+    -   `TuiAdapter`는 `DescriptionGenerated` 이벤트를 수신하여 메시지 로그에 묘사를 출력.
 
-5.  **아이템 시스템 구현**
-    -   맵에 아이템을 배치하고, 플레이어가 획득/사용하는 기능 구현 (`ItemFound`, `ItemUsed` 이벤트)
-    -   `TuiAdapter`가 관련 이벤트를 처리하여 인벤토리 및 메시지 로그를 갱신
+5.  **영속성 기능 활성화**
+    -   플레이어의 턴이 끝날 때마다(`handlePlayerAction` 처리 완료 후), `GameEngine`이 `persistence_port_`를 호출하여 현재 게임 상태를 저장하도록 구현 (자동 저장).
+    -   게임 시작 시 `persistence_port_`를 통해 저장된 게임을 불러오는 로직 추가.
 
-6.  **영속성 기능 활성화**
-    -   플레이어의 턴이 끝날 때마다(`handlePlayerAction` 처리 완료 후), `GameEngine`이 `persistence_port_`를 호출하여 현재 게임 상태를 저장하도록 구현 (자동 저장)
-    -   게임 시작 시 `persistence_port_`를 통해 저장된 게임을 불러오는 로직 추가
-
-7.  **최종 다듬기**
-    -   TUI 레이아웃 개선 (맵 뷰, 메시지 로그, 상태 바)
-    -   게임 시작 화면, 조작법 안내 등 추가
-    -   `HardcodedDescAdapter`와 `ChatGPTAdapter`를 쉽게 교체하며 시연할 수 있도록 준비
+6.  **최종 다듬기**
+    -   TUI 레이아웃 개선 (맵 뷰, 메시지 로그, 상태 바).
+    -   게임 시작 화면, 조작법 안내 등 추가.
+    -   `HardcodedDescAdapter`와 `ChatGPTAdapter`를 쉽게 교체하며 시연할 수 있도록 준비.

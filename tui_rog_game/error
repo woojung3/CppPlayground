@@ -1,0 +1,31 @@
+~/workspace/CppPlayground/build main ⇡3 !9 ?5 ❯ make -j                                                                                        jwlee@minipc
+[  3%] Built target domain_model
+[  7%] Built target screen
+[  9%] Built target gtest
+[ 13%] Built target spdlog
+[ 36%] Built target leveldb
+[ 46%] Built target benchmark
+[ 48%] Built target port_in
+[ 50%] Built target domain_event
+[ 50%] Built target port_out
+[ 50%] Built target gmock
+[ 50%] Built target gtest_main
+[ 51%] Built target benchmark_main
+[ 75%] Built target dom
+[ 75%] Built target leveldbutil
+[ 76%] Built target persistence_adapter
+[ 76%] Built target description_adapter
+[ 78%] Built target gmock_main
+[ 80%] Building CXX object application/domain/service/CMakeFiles/domain_service.dir/src/GameEngine.cc.o
+[ 96%] Built target component
+[ 98%] Building CXX object adapter/in/tui/CMakeFiles/tui_adapter.dir/src/TuiAdapter.cc.o
+In file included from /home/jwlee/workspace/CppPlayground/tui_rog_game/application/domain/service/src/GameEngine.cc:1:
+/home/jwlee/workspace/CppPlayground/tui_rog_game/application/domain/service/include/GameEngine.h:25:10: error: ‘void TuiRogGame::Domain::Service::GameEngine::setRenderPort(TuiRogGame::Port::Out::IRenderPort*)’ marked ‘override’, but does not override
+   25 |     void setRenderPort(Port::Out::IRenderPort* render_port) override;
+      |          ^~~~~~~~~~~~~
+make[2]: *** [application/domain/service/CMakeFiles/domain_service.dir/build.make:76: application/domain/service/CMakeFiles/domain_service.dir/src/GameEngine.cc.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:867: application/domain/service/CMakeFiles/domain_service.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[ 98%] Linking CXX static library libtui_adapter.a
+[ 98%] Built target tui_adapter
+make: *** [Makefile:156: all] Error 2

@@ -18,6 +18,7 @@ namespace TuiRogGame {
             // within the command's constructor or a dedicated validator.
             struct PlayerActionCommand {
                 enum ActionType {
+                    INITIALIZE, // To initialize the game state
                     MOVE_UP,
                     MOVE_DOWN,
                     MOVE_LEFT,
@@ -29,6 +30,7 @@ namespace TuiRogGame {
                 };
 
                 ActionType type;
+
                 // Using std::variant for a type-safe payload
                 // std::monostate for actions with no specific payload
                 // int for simple integer values (e.g., attack strength, direction magnitude)

@@ -9,42 +9,35 @@
 
 #include <vector>
 #include <memory>
+#include "Map.h"
 
 namespace TuiRogGame {
 namespace Domain {
 namespace Service {
 
-class GameEngine : public TuiRogGame::Port::In::IGetPlayerActionUseCase {
+class GameEngine : public Port::In::IGetPlayerActionUseCase {
 public:
-    // Constructor with dependency injection for the outbound ports
     GameEngine(
-        std::unique_ptr<TuiRogGame::Port::Out::IPersistencePort> persistence_port,
-        std::unique_ptr<TuiRogGame::Port::Out::IGenerateDescriptionPort> description_port
+        std::unique_ptr<Port::Out::IPersistencePort> persistence_port,
+        std::unique_ptr<Port::Out::IGenerateDescriptionPort> description_port
     );
 
-    // Setter for the render port to break circular dependency
-    void setRenderPort(TuiRogGame::Port::Out::IRenderPort* render_port);
-
-    // Main game loop entry point
-    void run();
-
-    // Implementation of the inbound port
-    void handlePlayerAction(const TuiRogGame::Port::In::PlayerActionCommand& command) override;
+    void setRenderPort(Port::Out::IRenderPort* render_port);
+    void handlePlayerAction(const Port::In::PlayerActionCommand& command) override;
 
 private:
     // Initializes the game state (player, map, etc.) and returns initial events.
     std::vector<std::unique_ptr<Domain::Event::DomainEvent>> initializeGame();
-    std::vector<std::unique_ptr<TuiRogGame::Domain::Event::DomainEvent>> processPlayerMove(int dx, int dy);
-    void processEvents(const std::vector<std::unique_ptr<TuiRogGame::Domain::Event::DomainEvent>>& events);
+    std::vector<std::unique_ptr<Domain::Event::DomainEvent>> processPlayerMove(int dx, int dy);
+    void processEvents(const std::vector<std::unique_ptr<Domain::Event::DomainEvent>>& events);
 
-    TuiRogGame::Port::Out::IRenderPort* render_port_ = nullptr;
-    std::unique_ptr<TuiRogGame::Port::Out::IPersistencePort> persistence_port_;
-    std::unique_ptr<TuiRogGame::Port::Out::IGenerateDescriptionPort> description_port_;
-
-    std::unique_ptr<TuiRogGame::Domain::Model::Player> player_;
-    // std::vector<Enemy> enemies_;
-    // Map map_;
     bool is_running_ = false;
+    std::unique_ptr<Port::Out::IPersistencePort> persistence_port_;
+    std::unique_ptr<Port::Out::IGenerateDescriptionPort> description_port_;
+    Port::Out::IRenderPort* render_port_ = nullptr;
+
+    std::unique_ptr<Model::Player> player_;
+    std::unique_ptr<Model::Map> map_;
 };
 
 } // namespace Service
