@@ -12,7 +12,7 @@ class PlayerMovedEvent : public DomainEvent {
 public:
     explicit PlayerMovedEvent(const TuiRogGame::Domain::Model::Position& new_position);
 
-    Type getType() const override;
+
     std::string toString() const override;
 
     TuiRogGame::Domain::Model::Position getNewPosition() const;

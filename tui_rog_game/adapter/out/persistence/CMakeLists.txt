@@ -1,7 +1,12 @@
 # Persistence Adapter는 정적(STATIC) 라이브러리로 정의합니다.
 add_library(persistence_adapter STATIC
-    src/LevelDbAdapter.cc
     src/InMemoryAdapter.cc
+    src/LevelDbAdapter.cc
+    src/CrudRepository.cc
+    src/PlayerRepository.cc
+    src/MapRepository.cc
+    src/ItemRepository.cc
+    src/EnemyRepository.cc
 )
 
 # 네임스페이스 별칭을 생성합니다.
@@ -18,9 +23,11 @@ target_include_directories(persistence_adapter
 
 # domain/model, port/out 모듈 및 LevelDB에 의존합니다.
 target_link_libraries(persistence_adapter
-    PRIVATE
-        tui_rog_game::domain::model
+    PUBLIC
         tui_rog_game::port::out
-        leveldb # LevelDB FetchContent target
+        nlohmann_json::nlohmann_json # For JSON serialization in repositories
+        tui_rog_game::common # For ScopeGuard.h
+    PRIVATE
         spdlog::spdlog
+        leveldb # LevelDB library
 )

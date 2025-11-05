@@ -1,4 +1,5 @@
 #include "Player.h"
+#include <memory> // std::unique_ptr를 위해 추가
 
 namespace TuiRogGame {
 namespace Domain {
@@ -11,15 +12,47 @@ namespace {
     }
 } // namespace
 
-Player::Player(PlayerId id, int level, int xp, Stats stats, Position position)
+Player::Player(PlayerId id, Stats stats, Position position)
     : id_(std::move(id)),
-      level_(level),
-      xp_(xp),
       stats_(stats),
       position_(position) 
 {
-    max_hp_ = calculateMaxHp(stats_);
-    hp_ = max_hp_; // Start with full health
+    hp_ = getMaxHp(); // Start with full health
+}
+
+// New constructor for persistence
+Player::Player(PlayerId id, PlayerCoreStats core_stats, Stats stats, Position position, std::vector<std::unique_ptr<Item>> inventory)
+    : id_(std::move(id)),
+      level_(core_stats.level),
+      xp_(core_stats.xp),
+      hp_(core_stats.hp),
+      stats_(stats),
+      position_(position),
+      inventory_(std::move(inventory))
+{
+    // No need to calculate max HP here, as hp_ is directly loaded
+}
+
+Player::Player(const Player& other)
+    : id_(other.id_),
+      level_(other.level_),
+      xp_(other.xp_),
+      hp_(other.hp_),
+      stats_(other.stats_),
+      position_(other.position_)
+{
+    for (const auto& item_ptr : other.inventory_) {
+        inventory_.push_back(std::make_unique<Item>(*item_ptr));
+    }
+}
+
+int Player::getMaxHp() const {
+    return calculateMaxHp(stats_);
+}
+
+int Player::getAttackPower() const {
+    // Example: 5 base attack + 2 attack per strength point
+    return 5 + (stats_.strength * 2);
 }
 
 void Player::moveTo(Position new_position) {
@@ -42,8 +75,7 @@ bool Player::gainXp(int amount) {
         stats_.vitality++;
 
         // Recalculate max_hp and heal to full
-        max_hp_ = calculateMaxHp(stats_);
-        hp_ = max_hp_;
+        hp_ = getMaxHp();
 
         leveled_up = true;
     }
@@ -57,8 +89,24 @@ void Player::takeDamage(int amount) {
     }
 }
 
-void Player::addItem(const Item& item) {
-    inventory_.push_back(item);
+void Player::addItem(std::unique_ptr<Item> item) {
+    inventory_.push_back(std::move(item));
+}
+
+bool Player::useItem(const std::string& item_name) {
+    for (auto it = inventory_.begin(); it != inventory_.end(); ++it) {
+        if ((*it)->getName() == item_name) {
+            // Found the item, apply its effect
+            if ((*it)->getType() == Item::ItemType::HealthPotion) {
+                hp_ = std::min(hp_ + 20, getMaxHp()); // Restore 20 HP, not exceeding max HP
+            }
+            // Add other item effects here
+
+            inventory_.erase(it); // Remove item from inventory
+            return true;
+        }
+    }
+    return false; // Item not found or could not be used
 }
 
 } // namespace Model

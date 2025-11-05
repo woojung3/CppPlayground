@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <memory>
+#include <optional> // For std::optional
 #include "Map.h"
 
 namespace TuiRogGame {
@@ -19,7 +20,8 @@ class GameEngine : public Port::In::IGetPlayerActionUseCase {
 public:
     GameEngine(
         std::unique_ptr<Port::Out::IPersistencePort> persistence_port,
-        std::unique_ptr<Port::Out::IGenerateDescriptionPort> description_port
+        std::unique_ptr<Port::Out::IGenerateDescriptionPort> primary_description_port,
+        std::unique_ptr<Port::Out::IGenerateDescriptionPort> alternative_description_port
     );
 
     void setRenderPort(Port::Out::IRenderPort* render_port);
@@ -33,11 +35,17 @@ private:
 
     bool is_running_ = false;
     std::unique_ptr<Port::Out::IPersistencePort> persistence_port_;
-    std::unique_ptr<Port::Out::IGenerateDescriptionPort> description_port_;
+    std::unique_ptr<Port::Out::IGenerateDescriptionPort> primary_description_port_; // Renamed
+    std::unique_ptr<Port::Out::IGenerateDescriptionPort> alternative_description_port_; // New
+    bool use_alternative_description_port_ = false; // New flag
     Port::Out::IRenderPort* render_port_ = nullptr;
 
     std::unique_ptr<Model::Player> player_;
     std::unique_ptr<Model::Map> map_;
+    std::optional<Model::Enemy> current_enemy_; // To track the enemy in combat
+
+public: // Added public method for toggling
+    void toggleDescriptionPort();
 };
 
 } // namespace Service

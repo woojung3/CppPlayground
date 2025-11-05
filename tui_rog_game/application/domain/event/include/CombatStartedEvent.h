@@ -24,7 +24,7 @@ public:
         int enemy_defense
     );
 
-    Type getType() const override;
+
     std::string toString() const override;
 
     EnemyType getEnemyType() const { return enemy_type_; }

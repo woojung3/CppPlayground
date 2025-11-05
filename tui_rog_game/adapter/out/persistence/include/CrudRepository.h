@@ -1,0 +1,122 @@
+#ifndef TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_CRUDREPOSITORY_H
+#define TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_CRUDREPOSITORY_H
+
+#include <string>
+#include <optional>
+#include <memory> // For std::unique_ptr
+#include <type_traits> // For std::is_standard_layout_v
+#include <algorithm> // For std::transform
+#include <cctype> // For std::tolower
+
+#include <leveldb/db.h> // LevelDB header
+#include <leveldb/write_batch.h> // For leveldb::WriteBatch
+#include <spdlog/spdlog.h> // Include spdlog for logging
+#include <cstring> // For std::memcpy
+
+namespace TuiRogGame {
+    namespace Adapter {
+        namespace Out {
+            namespace Persistence {
+
+                // Helper to convert string to lowercase
+                inline std::string toLower(std::string s) {
+                    std::transform(s.begin(), s.end(), s.begin(),
+                                   [](unsigned char c){ return std::tolower(c); });
+                    return s;
+                }
+
+                template <typename T, typename Enable = void>
+                class CrudRepository; // Forward declaration
+
+                // Specialization for standard layout types
+                template <typename T>
+                class CrudRepository<T, std::enable_if_t<std::is_standard_layout_v<T>>> {
+                public:
+                    // SFINAE check for standard layout
+                    static_assert(std::is_standard_layout_v<T>, "CrudRepository can only be used with standard layout types.");
+
+                    explicit CrudRepository(std::shared_ptr<leveldb::DB> db)
+                        : db_(db) {
+                        if (!db_) {
+                            spdlog::error("CrudRepository: Initialized with null LevelDB pointer.");
+                        }
+                    }
+
+                    void save(const std::string& key, const T& value) {
+                        if (!db_) {
+                            spdlog::error("CrudRepository: Cannot save, LevelDB is not open.");
+                            return;
+                        }
+
+                        std::string lower_key = toLower(key);
+                        leveldb::Slice value_slice(reinterpret_cast<const char*>(&value), sizeof(T));
+                        leveldb::Status status = db_->Put(leveldb::WriteOptions(), lower_key, value_slice);
+
+                        if (!status.ok()) {
+                            spdlog::error("CrudRepository: Failed to save key '{}': {}", lower_key, status.ToString());
+                        } else {
+                            spdlog::debug("CrudRepository: Saved key '{}' of size {}", lower_key, sizeof(T));
+                        }
+                    }
+
+                    // New save method that takes a WriteBatch
+                    void save(const std::string& key, const T& value, leveldb::WriteBatch& batch) {
+                        std::string lower_key = toLower(key);
+                        leveldb::Slice value_slice(reinterpret_cast<const char*>(&value), sizeof(T));
+                        batch.Put(lower_key, value_slice);
+                        spdlog::debug("CrudRepository: Added Put for key '{}' to WriteBatch.", lower_key);
+                    }
+
+                    std::optional<T> findById(const std::string& key) {
+                        if (!db_) {
+                            spdlog::error("CrudRepository: Cannot find, LevelDB is not open.");
+                            return std::nullopt;
+                        }
+
+                        std::string lower_key = toLower(key);
+                        std::string value_str;
+                        leveldb::Status status = db_->Get(leveldb::ReadOptions(), lower_key, &value_str);
+
+                        if (status.IsNotFound()) {
+                            spdlog::debug("CrudRepository: Key '{}' not found.", lower_key);
+                            return std::nullopt;
+                        } else if (!status.ok()) {
+                            spdlog::error("CrudRepository: Failed to find key '{}': {}", lower_key, status.ToString());
+                            return std::nullopt;
+                        } else {
+                            if (value_str.length() == sizeof(T)) {
+                                T result;
+                                std::memcpy(&result, value_str.data(), sizeof(T));
+                                spdlog::debug("CrudRepository: Found key '{}' of size {}", lower_key, sizeof(T));
+                                return result;
+                            } else {
+                                spdlog::error("CrudRepository: Value length mismatch for key '{}'. Expected {} bytes, got {} bytes.", lower_key, sizeof(T), value_str.length());
+                                return std::nullopt;
+                            }
+                        }
+                    }
+
+                    void deleteById(const std::string& key) {
+                        if (!db_) {
+                            spdlog::error("CrudRepository: Cannot delete, LevelDB is not open.");
+                            return;
+                        }
+
+                        std::string lower_key = toLower(key);
+                        leveldb::Status status = db_->Delete(leveldb::WriteOptions(), lower_key);
+
+                        if (!status.ok()) {
+                            spdlog::error("CrudRepository: Failed to delete key '{}': {}", lower_key, status.ToString());
+                        }
+                    }
+
+                private:
+                    std::shared_ptr<leveldb::DB> db_;
+                };
+
+            } // namespace Persistence
+        } // namespace Out
+    } // namespace Adapter
+} // namespace TuiRogGame
+
+#endif // TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_CRUDREPOSITORY_H

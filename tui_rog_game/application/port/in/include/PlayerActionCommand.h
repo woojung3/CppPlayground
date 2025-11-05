@@ -25,6 +25,7 @@ namespace TuiRogGame {
                     MOVE_RIGHT,
                     ATTACK,
                     INTERACT,
+                    USE_ITEM, // New action type
                     QUIT,
                     UNKNOWN // Default or error state
                 };
@@ -79,6 +80,11 @@ namespace TuiRogGame {
                             if (!std::holds_alternative<std::string>(payload)) {
                                 // Example: Interact with an item by its ID
                                 // throw std::invalid_argument("Interact action requires a string payload (e.g., item ID).");
+                            }
+                            break;
+                        case USE_ITEM:
+                            if (!std::holds_alternative<std::string>(payload)) {
+                                throw std::invalid_argument("UseItem action requires a string payload (item ID/name).");
                             }
                             break;
                         case QUIT:

@@ -15,11 +15,14 @@ public:
         Goblin
     };
 
-    Enemy(EnemyType type, int hp, Stats stats, Position position);
+    Enemy(EnemyType type, std::string name, Stats stats, Position position);
 
     // Getters
     EnemyType getType() const { return type_; }
-    int getHp() const { return hp_; }
+    const std::string& getName() const { return name_; }
+    int getHealth() const { return health_; }
+    int getMaxHealth() const; // Calculated from stats_.vitality
+    int getAttackPower() const; // Calculated from stats_.strength
     const Stats& getStats() const { return stats_; }
     const Position& getPosition() const { return position_; }
 
@@ -27,7 +30,8 @@ public:
 
 private:
     EnemyType type_;
-    int hp_ = 50;
+    std::string name_;
+    int health_; // Current health
     Stats stats_;
     Position position_;
 };

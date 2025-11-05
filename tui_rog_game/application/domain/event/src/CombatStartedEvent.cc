@@ -24,15 +24,14 @@ CombatStartedEvent::CombatStartedEvent(
     int enemy_hp,
     int enemy_attack,
     int enemy_defense)
-    : enemy_type_(enemy_type),
+    : DomainEvent(Type::CombatStarted),
+      enemy_type_(enemy_type),
       enemy_name_(enemy_name),
       enemy_hp_(enemy_hp),
       enemy_attack_(enemy_attack),
       enemy_defense_(enemy_defense) {}
 
-DomainEvent::Type CombatStartedEvent::getType() const {
-    return Type::CombatStarted;
-}
+
 
 std::string CombatStartedEvent::toString() const {
     return "CombatStartedEvent: Combat started with " + enemy_name_ + ". HP: " + std::to_string(enemy_hp_);

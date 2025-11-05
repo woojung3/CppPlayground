@@ -18,8 +18,10 @@ target_include_directories(description_adapter
 
 # port/out 모듈, cpp-httplib, nlohmann/json에 의존합니다.
 target_link_libraries(description_adapter
-    PRIVATE
+    PUBLIC
         tui_rog_game::port::out
+    PRIVATE
         httplib # cpp-httplib FetchContent target
         nlohmann_json::nlohmann_json # nlohmann/json FetchContent target
+        spdlog::spdlog # spdlog
 )

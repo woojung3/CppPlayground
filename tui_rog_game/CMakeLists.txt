@@ -9,6 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # For LSP support
 add_subdirectory(adapter/in/tui)
 add_subdirectory(adapter/out/persistence)
 add_subdirectory(adapter/out/description)
+add_subdirectory(adapter/out/description/test)
 add_subdirectory(application/domain/model)
 add_subdirectory(application/domain/event)
 add_subdirectory(application/domain/service)

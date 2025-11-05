@@ -21,4 +21,6 @@ target_include_directories(domain_model
 )
 
 target_link_libraries(domain_model
+    PRIVATE
+        spdlog::spdlog
 )

@@ -22,13 +22,12 @@ ItemFoundEvent::ItemFoundEvent(
     ItemType item_type,
     const std::string& item_name,
     const std::string& item_description)
-    : item_type_(item_type),
+    : DomainEvent(Type::ItemFound),
+      item_type_(item_type),
       item_name_(item_name),
       item_description_(item_description) {}
 
-DomainEvent::Type ItemFoundEvent::getType() const {
-    return Type::ItemFound;
-}
+
 
 std::string ItemFoundEvent::toString() const {
     return "ItemFoundEvent: Found " + item_name_ + ". " + item_description_;

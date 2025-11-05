@@ -23,7 +23,7 @@ public:
         const std::string& item_description
     );
 
-    Type getType() const override;
+
     std::string toString() const override;
 
     ItemType getItemType() const { return item_type_; }

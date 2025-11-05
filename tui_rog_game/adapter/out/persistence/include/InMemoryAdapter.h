@@ -18,18 +18,17 @@ namespace TuiRogGame {
                     InMemoryAdapter() = default;
                     ~InMemoryAdapter() override = default;
 
-                    // Saves a copy of the player's state to an in-memory store.
-                    void savePlayer(const TuiRogGame::Domain::Model::Player& player) override;
+                    // Saves the full game state to an in-memory store.
+                    void saveGame(const TuiRogGame::Port::Out::GameStateDTO& gameState) override;
 
-                    // Loads the player's state from the in-memory store.
-                    // Returns a unique_ptr to a new Player object, or nullptr if no player was saved.
-                    std::unique_ptr<TuiRogGame::Domain::Model::Player> loadPlayer() override;
+                    // Loads the full game state from the in-memory store.
+                    // Returns a unique_ptr to a new GameStateDTO object, or nullptr if no game was saved.
+                    std::unique_ptr<TuiRogGame::Port::Out::GameStateDTO> loadGame() override;
 
                 private:
-                    // Stores the last saved player state. Using std::optional to represent
-                    // whether a player has been saved or not. When a player is saved,
-                    // a copy is made and stored here.
-                    std::optional<TuiRogGame::Domain::Model::Player> stored_player_;
+                    // Stores the last saved game state. Using std::optional to represent
+                    // whether a game has been saved or not.
+                    std::optional<TuiRogGame::Port::Out::GameStateDTO> stored_game_state_;
                 };
 
             } // namespace Persistence

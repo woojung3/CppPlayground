@@ -1,5 +1,5 @@
 #include "InMemoryAdapter.h"
-#include <iostream>
+#include "GameStateDTO.h"
 #include <spdlog/spdlog.h>
 
 namespace TuiRogGame {
@@ -7,18 +7,18 @@ namespace TuiRogGame {
         namespace Out {
             namespace Persistence {
 
-                void InMemoryAdapter::savePlayer(const TuiRogGame::Domain::Model::Player& player) {
-                    stored_player_ = player; // Store a copy of the player object
-                    spdlog::info("[InMemoryAdapter] Player saved: {}", player.getName());
+                void InMemoryAdapter::saveGame(const TuiRogGame::Port::Out::GameStateDTO& gameState) {
+                    stored_game_state_.emplace(gameState); // GameStateDTO를 값 복사하여 저장
+                    spdlog::info("[InMemoryAdapter] Game saved.");
                 }
 
-                std::unique_ptr<TuiRogGame::Domain::Model::Player> InMemoryAdapter::loadPlayer() {
-                    if (stored_player_) {
-                        // Create a new Player object from the stored optional and return its unique_ptr
-                        spdlog::info("[InMemoryAdapter] Player loaded: {}", stored_player_->getName());
-                        return std::make_unique<TuiRogGame::Domain::Model::Player>(*stored_player_);
+                std::unique_ptr<TuiRogGame::Port::Out::GameStateDTO> InMemoryAdapter::loadGame() {
+                    if (stored_game_state_) {
+                        // Create a new GameStateDTO object from the stored optional and return its unique_ptr
+                        spdlog::info("[InMemoryAdapter] Game loaded.");
+                        return std::make_unique<TuiRogGame::Port::Out::GameStateDTO>(*stored_game_state_);
                     } else {
-                        spdlog::info("[InMemoryAdapter] No player found to load.");
+                        spdlog::info("[InMemoryAdapter] No game found to load.");
                         return nullptr;
                     }
                 }

@@ -18,6 +18,9 @@ namespace TuiRogGame {
                 // Pure virtual function to handle a player action.
                 // The command object encapsulates the action details and is validated on construction.
                 virtual void handlePlayerAction(const TuiRogGame::Port::In::PlayerActionCommand& command) = 0;
+
+                // Toggles the description port between hardcoded and AI.
+                virtual void toggleDescriptionPort() = 0;
             };
 
         } // namespace In

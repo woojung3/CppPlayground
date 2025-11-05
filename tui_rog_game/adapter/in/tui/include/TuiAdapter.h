@@ -25,6 +25,7 @@ private:
     ftxui::ScreenInteractive& screen_;
     std::shared_ptr<std::optional<Port::Out::GameStateDTO>> game_state_ptr_;
     std::vector<std::string> message_log_;
+    bool show_start_screen_ = true; // New member to control start screen visibility
 };
 
 } // namespace Tui
