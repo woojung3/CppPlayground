@@ -1,5 +1,7 @@
 #include "GameEngine.h"
 #include "PlayerMovedEvent.h"
+#include "CombatStartedEvent.h"
+#include "ItemFoundEvent.h"
 #include <iostream> // For temporary output
 #include <spdlog/spdlog.h>
 
@@ -79,6 +81,13 @@ std::vector<std::unique_ptr<TuiRogGame::Domain::Event::DomainEvent>> GameEngine:
     spdlog::info("GameEngine: Entering processPlayerMove(dx={}, dy={}).", dx, dy);
     Model::Position current_pos = player_->getPosition();
     Model::Position new_pos = {current_pos.x + dx, current_pos.y + dy};
+
+    // Wall collision detection
+    if (!map_->isWalkable(new_pos.x, new_pos.y)) {
+        spdlog::info("GameEngine: Player move blocked to ({}, {}). Wall detected.", new_pos.x, new_pos.y);
+        return {}; // Return no events, player does not move
+    }
+
     spdlog::info("GameEngine: Player current position ({}, {}), new position ({}, {}).", current_pos.x, current_pos.y, new_pos.x, new_pos.y);
     player_->moveTo(new_pos);
     spdlog::info("GameEngine: Player moved to new position ({}, {}).", new_pos.x, new_pos.y);
@@ -87,6 +96,32 @@ std::vector<std::unique_ptr<TuiRogGame::Domain::Event::DomainEvent>> GameEngine:
     std::vector<std::unique_ptr<Domain::Event::DomainEvent>> events;
     events.push_back(std::make_unique<Domain::Event::PlayerMovedEvent>(new_pos));
     spdlog::info("GameEngine: PlayerMovedEvent created.");
+
+    // Check for enemy encounter
+    if (auto enemy_opt = map_->getEnemyAt(new_pos)) {
+        const auto& enemy = enemy_opt->get();
+        events.push_back(std::make_unique<Domain::Event::CombatStartedEvent>(
+            static_cast<Domain::Event::CombatStartedEvent::EnemyType>(enemy.getType()),
+            "", // Enemy name is not directly available in Enemy.h, assuming it's part of type or will be added
+            enemy.getHp(),
+            enemy.getStats().strength,
+            enemy.getStats().vitality
+        ));
+        spdlog::info("GameEngine: CombatStartedEvent created with enemy at ({}, {}).", new_pos.x, new_pos.y);
+    } else if (auto item_opt = map_->getItemAt(new_pos)) {
+        // Check for item found (only if no enemy)
+        auto item_unique_ptr = map_->takeItemAt(new_pos);
+        if (item_unique_ptr) {
+            events.push_back(std::make_unique<Domain::Event::ItemFoundEvent>(
+                static_cast<Domain::Event::ItemFoundEvent::ItemType>(item_unique_ptr->getType()),
+                item_unique_ptr->getName(),
+                "" // Item description is not directly available in Item.h, assuming it's part of type or will be added
+            ));
+            // TODO: Add item to player inventory
+            spdlog::info("GameEngine: ItemFoundEvent created with item at ({}, {}).", new_pos.x, new_pos.y);
+        }
+    }
+
     return events;
 }
 

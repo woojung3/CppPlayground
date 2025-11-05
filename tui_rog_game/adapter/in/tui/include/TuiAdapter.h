@@ -24,6 +24,7 @@ private:
     Port::In::IGetPlayerActionUseCase& game_engine_;
     ftxui::ScreenInteractive& screen_;
     std::shared_ptr<std::optional<Port::Out::GameStateDTO>> game_state_ptr_;
+    std::vector<std::string> message_log_;
 };
 
 } // namespace Tui

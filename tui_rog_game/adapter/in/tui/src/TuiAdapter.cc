@@ -1,5 +1,7 @@
 #include "TuiAdapter.h"
 #include "PlayerMovedEvent.h"
+#include "CombatStartedEvent.h"
+#include "ItemFoundEvent.h"
 #include "Map.h"
 #include "Player.h"
 #include <ftxui/component/screen_interactive.hpp>
@@ -9,6 +11,7 @@
 #include <spdlog/spdlog.h>
 #include <vector>
 #include <string>
+#include <algorithm> // For std::min
 
 namespace TuiRogGame {
 namespace Adapter {
@@ -30,6 +33,7 @@ ftxui::Element TileToElement(Domain::Model::Tile tile) {
 TuiAdapter::TuiAdapter(Port::In::IGetPlayerActionUseCase& game_engine, ftxui::ScreenInteractive& screen)
     : game_engine_(game_engine), screen_(screen), game_state_ptr_(std::make_shared<std::optional<Port::Out::GameStateDTO>>(std::nullopt)) {
     spdlog::info("TuiAdapter initialized.");
+    message_log_.push_back("Welcome to TUI-ROG!");
 }
 
 void TuiAdapter::run() {
@@ -66,7 +70,20 @@ void TuiAdapter::run() {
             text("XP: " + std::to_string(player.getXp())),
         });
 
-        return hbox({map_view, separator(), stats_view});
+        // Message Log
+        Elements log_lines;
+        // Display last 5 messages
+        int start_index = std::max(0, (int)message_log_.size() - 5);
+        for (size_t i = start_index; i < message_log_.size(); ++i) {
+            log_lines.push_back(text(message_log_[i]));
+        }
+        auto message_log_view = vbox(log_lines) | border | flex;
+
+        return hbox({
+            vbox({map_view, separator(), message_log_view | flex}),
+            separator(),
+            stats_view
+        });
     });
 
     auto component = CatchEvent(renderer, [&](Event event) {
@@ -94,10 +111,23 @@ void TuiAdapter::run() {
 }
 
 void TuiAdapter::render(const Port::Out::GameStateDTO& game_state, const std::vector<std::unique_ptr<Domain::Event::DomainEvent>>& events) {
-    // This method is called from the GameEngine thread.
-    // To update the UI, we use emplace to construct a new GameStateDTO in the optional
-    // and then post an event to the UI thread.
     game_state_ptr_->emplace(game_state);
+
+    for (const auto& event : events) {
+        if (event->getType() == Domain::Event::DomainEvent::Type::CombatStarted) {
+            const auto* combat_event = dynamic_cast<const Domain::Event::CombatStartedEvent*>(event.get());
+            if (combat_event) {
+                message_log_.push_back("You encountered a " + combat_event->getEnemyName() + "!");
+            }
+        } else if (event->getType() == Domain::Event::DomainEvent::Type::ItemFound) {
+            const auto* item_event = dynamic_cast<const Domain::Event::ItemFoundEvent*>(event.get());
+            if (item_event) {
+                message_log_.push_back("You found a " + item_event->getItemName() + "!");
+            }
+        }
+        // Other events can be handled here
+    }
+
     screen_.PostEvent(ftxui::Event::Custom);
 }
 

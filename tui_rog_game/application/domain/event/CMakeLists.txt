@@ -1,6 +1,8 @@
 add_library(domain_event
     src/DomainEvent.cc
     src/PlayerMovedEvent.cc
+    src/CombatStartedEvent.cc
+    src/ItemFoundEvent.cc
 )
 
 add_library(tui_rog_game::domain::event ALIAS domain_event)

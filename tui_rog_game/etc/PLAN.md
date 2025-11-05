@@ -59,6 +59,18 @@
 
 -   **[완료] 0단계: 프로젝트 환경 설정**
 -   **[완료] 1단계: 기본 게임 루프 및 `DomainEvent` 시스템 완성**
+    -   `GameEngine` 초기화 흐름 개선 (Adapter가 `INITIALIZE` 커맨드 통해 요청)
+    -   `GameState`를 `GameStateDTO`로 변경 및 Port 계층으로 이동
+
+-   **[완료] 맵(`Map`) 시스템 확장 및 구현**
+    -   `Tile` 종류에 적(`ENEMY`), 아이템(`ITEM`) 추가 및 TUI 렌더링 구현
+    -   `Map` 모델에 `Enemy`와 `Item` 객체 저장 구조 (`std::unique_ptr` 사용) 및 관리 메서드 구현
+    -   `Map::generate()`를 통한 임시 맵 및 엔티티 배치 로직 구현
+    -   `GameEngine::processPlayerMove`에 벽 충돌 감지 로직 추가
+    -   `GameEngine::processPlayerMove`에 타일 이동 시 적/아이템 감지 로직 및 `CombatStartedEvent`, `ItemFoundEvent` 생성 로직 추가
+    -   `CombatStartedEvent`와 `ItemFoundEvent`를 Clean Architecture 의존성 규칙에 맞춰 분리된 헤더에 DTO 형태로 정의 (enum 재정의 및 `static_assert`를 통한 일관성 검증 포함)
+    -   `TuiAdapter`에서 `CombatStartedEvent`, `ItemFoundEvent`를 받아 메시지 로그에 출력하도록 구현
+
 -   **[부분 완료] 2단계: 성장 및 AI 연동**
 -   **[부분 완료] 3단계: 아이템 및 영속성 구현**
 
@@ -66,37 +78,28 @@
 
 ### 5. 앞으로 해야 할 일 (개발 순서)
 
-1.  **맵(`Map`) 시스템 확장 및 구현**
-    -   `Tile` 종류에 적(`ENEMY`), 아이템(`ITEM`)을 추가하고, 이를 나타내는 문자(e.g., `E`, `I`) 정의.
-    -   `Map` 모델에 `Enemy`와 `Item` 객체들을 특정 위치에 저장하는 구조 추가 (e.g., `std::map<Position, Enemy>`).
-    -   절차적으로 맵을 생성하고, 적과 아이템을 특정 위치에 배치하는 로직 구현.
-    -   `TuiAdapter`가 `Map`을 렌더링할 때, 플레이어(`@`), 적(`E`), 아이템(`I`) 등을 문자로 표시하도록 구현.
-    -   `GameEngine`의 이동 로직(`processPlayerMove`) 수정:
-        -   벽 충돌 감지 로직 추가.
-        -   새로운 타일로 이동 시, 해당 타일에 적이나 아이템이 있는지 확인.
-        -   적이 있으면 `CombatStarted` 이벤트 생성.
-        -   아이템이 있으면 `ItemFound` 이벤트 생성하고 맵에서 아이템 제거.
-
-2.  **전투 및 아이템 시스템 구현**
+1.  **전투 및 아이템 시스템 구현**
+    -   `Enemy` 클래스에 체력, 공격력, 이름과 같은 속성 추가 및 `takeDamage()` 구현
+    -   `Player` 클래스에 `takeDamage()`, `addXp()` 구현
     -   `GameEngine`에 `CombatStarted` 이벤트에 따른 턴제 전투 로직 구현 (`handlePlayerAction`의 `ATTACK` 케이스).
     -   `GameEngine`에 `ItemFound` 이벤트에 따른 아이템 획득 로직 구현 (플레이어 인벤토리에 추가).
     -   `TuiAdapter`가 `CombatStarted`, `ItemFound`, `PlayerAttacked`, `EnemyDefeated` 등의 이벤트를 수신하여 UI(메시지 로그, 상태 바 등)를 업데이트하도록 구현.
     -   플레이어의 아이템 사용 기능(`UseItem` 커맨드) 및 관련 로직 구현.
 
-3.  **성장 시스템 구현**
+2.  **성장 시스템 구현**
     -   전투 승리 시 XP 획득 및 레벨업 시스템 구현 (`PlayerLeveledUp` 이벤트 생성).
     -   `TuiAdapter`가 `PlayerLeveledUp` 이벤트를 수신하여 상태 바(Status Bar)의 레벨 정보를 갱신.
 
-4.  **AI 연동 기능 활성화**
+3.  **AI 연동 기능 활성화**
     -   플레이어가 새로운 바닥(`.`) 타일로 이동했을 때(`PlayerMoved` 이벤트 발생 시), `GameEngine`이 `description_port_`를 호출하여 장소 묘사를 얻어오도록 구현.
     -   가져온 묘사를 `DescriptionGenerated` 같은 새로운 `DomainEvent`로 만들어 `TuiAdapter`에 전달.
     -   `TuiAdapter`는 `DescriptionGenerated` 이벤트를 수신하여 메시지 로그에 묘사를 출력.
 
-5.  **영속성 기능 활성화**
+4.  **영속성 기능 활성화**
     -   플레이어의 턴이 끝날 때마다(`handlePlayerAction` 처리 완료 후), `GameEngine`이 `persistence_port_`를 호출하여 현재 게임 상태를 저장하도록 구현 (자동 저장).
     -   게임 시작 시 `persistence_port_`를 통해 저장된 게임을 불러오는 로직 추가.
 
-6.  **최종 다듬기**
+5.  **최종 다듬기**
     -   TUI 레이아웃 개선 (맵 뷰, 메시지 로그, 상태 바).
     -   게임 시작 화면, 조작법 안내 등 추가.
     -   `HardcodedDescAdapter`와 `ChatGPTAdapter`를 쉽게 교체하며 시연할 수 있도록 준비.
