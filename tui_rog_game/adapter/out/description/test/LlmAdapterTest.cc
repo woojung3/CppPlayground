@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
-#include "LlmAdapter.h" // This is now our GeminiAdapter
-#include "Position.h"
+#include "LlmAdapter.h"
+#include "Map.h" // Map.h 추가
+#include "Player.h" // Player.h 추가
+#include "GameStateDTO.h" // GameStateDTO.h 추가
 #include <string>
 #include <cstdlib> // For std::getenv
 #include <spdlog/spdlog.h>
@@ -9,14 +11,13 @@
 class LlmAdapterTest : public ::testing::Test {
 protected:
     TuiRogGame::Adapter::Out::Description::LlmAdapter adapter;
-    TuiRogGame::Domain::Model::Position test_position = {5, 10};
 
     void SetUp() override {
         // Ensure GEMINI_API_KEY is set for the test
-        if (std::getenv("GEMINI_API_KEY") == nullptr) {
-            spdlog::warn("GEMINI_API_KEY not set. Gemini API tests might fail.");
+        if (std::getenv("GROQ_API_KEY") == nullptr) {
+            spdlog::warn("GROQ_API_KEY not set. Gemini API tests might fail.");
             // Optionally, skip tests if API key is not set
-            // GTEST_SKIP() << "GEMINI_API_KEY not set. Skipping Gemini API tests.";
+            // GTEST_SKIP() << "GROQ_API_KEY not set. Skipping Gemini API tests.";
         }
     }
 };
@@ -24,7 +25,13 @@ protected:
 // Test case for generateDescription
 TEST_F(LlmAdapterTest, GeneratesNonEmptyDescription) {
     spdlog::info("Running LlmAdapterTest.GeneratesNonEmptyDescription");
-    std::string description = adapter.generateDescription(test_position);
+
+    // 더미 Map, Player, GameStateDTO 생성
+    TuiRogGame::Domain::Model::Map dummy_map(10, 10); // 10x10 맵 생성
+    TuiRogGame::Domain::Model::Player dummy_player("test_player", TuiRogGame::Domain::Model::Stats{10, 10, 10, 10}, TuiRogGame::Domain::Model::Position{5, 5});
+    TuiRogGame::Port::Out::GameStateDTO dummy_game_state(dummy_map, dummy_player);
+
+    std::string description = adapter.generateDescription(dummy_game_state);
     spdlog::info("Generated Description: {}", description);
 
     // Assert that the description is not empty

@@ -16,6 +16,7 @@ add_subdirectory(application/domain/service)
 add_subdirectory(application/port/in)
 add_subdirectory(application/port/out)
 add_subdirectory(common)
+add_subdirectory(assembly)
 
 ############################
 # Fetch External Dependencies
@@ -105,7 +106,7 @@ add_executable(tui_rog_game main.cc)
 # Link all libraries to the main executable
 target_link_libraries(tui_rog_game
     PRIVATE
-        tui_adapter
+        adapter_in_tui
         persistence_adapter
         description_adapter
         domain_model
@@ -113,7 +114,7 @@ target_link_libraries(tui_rog_game
         domain_service
         port_in
         port_out
-    # External libs will be linked below
+        assembly
 )
 
 target_link_libraries(tui_rog_game 

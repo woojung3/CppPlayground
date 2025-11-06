@@ -1,32 +1,25 @@
-#ifndef TUI_ROG_GAME_ADAPTER_OUT_DESCRIPTION_CHATGPTADAPTER_H
-#define TUI_ROG_GAME_ADAPTER_OUT_DESCRIPTION_CHATGPTADAPTER_H
+#pragma once
 
 #include "IGenerateDescriptionPort.h"
-#include <string>
-#include <memory> // Required for std::unique_ptr
-#include <httplib.h> // Required for httplib::Client
+#include "GameStateDTO.h" // GameStateDTO를 포함
+#include <memory>
+#include <httplib.h>
 
 namespace TuiRogGame {
-    namespace Adapter {
-        namespace Out {
-            namespace Description {
+namespace Adapter {
+namespace Out {
+namespace Description {
 
-                // LlmAdapter is a concrete implementation of IGenerateDescriptionPort
-                // that interacts with the ChatGPT API to generate descriptions.
-                class LlmAdapter : public Port::Out::IGenerateDescriptionPort {
-                public:
-                    LlmAdapter();
-                    ~LlmAdapter() override = default;
+class LlmAdapter : public Port::Out::IGenerateDescriptionPort {
+public:
+    LlmAdapter();
+    std::string generateDescription(const Port::Out::GameStateDTO& game_state) override;
 
-                    std::string generateDescription(const TuiRogGame::Domain::Model::Position& player_position) override;
+private:
+    std::unique_ptr<httplib::Client> cli_;
+};
 
-                private:
-                    std::unique_ptr<httplib::Client> cli_;
-                };
-
-            } // namespace Description
-        } // namespace Out
-    } // namespace Adapter
+} // namespace Description
+} // namespace Out
+} // namespace Adapter
 } // namespace TuiRogGame
-
-#endif // TUI_ROG_GAME_ADAPTER_OUT_DESCRIPTION_CHATGPTADAPTER_H

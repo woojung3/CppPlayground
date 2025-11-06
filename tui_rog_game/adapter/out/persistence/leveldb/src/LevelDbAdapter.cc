@@ -4,7 +4,6 @@
 #include "ItemRepository.h"
 #include "MapRepository.h"
 #include "PlayerRepository.h"
-#include "ScopeGuard.h"
 #include <spdlog/spdlog.h>
 
 namespace TuiRogGame {
@@ -35,7 +34,7 @@ LevelDbAdapter::LevelDbAdapter(const std::string& db_path)
 
 LevelDbAdapter::~LevelDbAdapter() = default;
 
-void LevelDbAdapter::saveGame(const Port::Out::GameStateDTO& game_state) {
+void LevelDbAdapter::saveGameState(const Port::Out::GameStateDTO& game_state) {
     auto& provider = LevelDbProvider::getInstance();
     provider.startBatch();
 
@@ -51,7 +50,7 @@ void LevelDbAdapter::saveGame(const Port::Out::GameStateDTO& game_state) {
     }
 }
 
-std::unique_ptr<Port::Out::GameStateDTO> LevelDbAdapter::loadGame() {
+std::unique_ptr<Port::Out::GameStateDTO> LevelDbAdapter::loadGameState() {
     auto player_opt = impl_->playerRepo.findById("main_player");
     auto map_opt = impl_->mapRepo.findById("main_map");
 

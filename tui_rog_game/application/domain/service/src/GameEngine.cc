@@ -19,10 +19,12 @@ namespace Domain {
 namespace Service {
 
 GameEngine::GameEngine(
-    std::unique_ptr<TuiRogGame::Port::Out::IPersistencePort> persistence_port,
+    std::shared_ptr<TuiRogGame::Port::Out::ISaveGameStatePort> save_port,
+    std::shared_ptr<TuiRogGame::Port::Out::ILoadGameStatePort> load_port,
     std::unique_ptr<TuiRogGame::Port::Out::IGenerateDescriptionPort> primary_description_port,
     std::unique_ptr<TuiRogGame::Port::Out::IGenerateDescriptionPort> alternative_description_port)
-    : persistence_port_(std::move(persistence_port)),
+    : save_port_(std::move(save_port)),
+      load_port_(std::move(load_port)),
       primary_description_port_(std::move(primary_description_port)),
       alternative_description_port_(std::move(alternative_description_port)) {
     spdlog::info("GameEngine initialized.");
@@ -35,8 +37,8 @@ void GameEngine::setRenderPort(TuiRogGame::Port::Out::IRenderPort* render_port) 
 std::vector<std::unique_ptr<TuiRogGame::Domain::Event::DomainEvent>> GameEngine::initializeGame() {
     std::vector<std::unique_ptr<Domain::Event::DomainEvent>> events;
 
-    if (persistence_port_) {
-        auto loaded_game_state = persistence_port_->loadGame();
+    if (load_port_) {
+        auto loaded_game_state = load_port_->loadGameState();
         if (loaded_game_state) {
             // Game loaded successfully
             map_ = std::make_unique<Model::Map>(loaded_game_state->map);
@@ -195,9 +197,9 @@ void GameEngine::handlePlayerAction(const TuiRogGame::Port::In::PlayerActionComm
     processEvents(events);
 
     // Auto-save after every player action
-    if (persistence_port_) {
+    if (save_port_) {
         Port::Out::GameStateDTO game_state_to_save(*map_, *player_);
-        persistence_port_->saveGame(game_state_to_save);
+        save_port_->saveGameState(game_state_to_save);
         spdlog::info("Game auto-saved.");
     }
 }
@@ -231,7 +233,8 @@ std::vector<std::unique_ptr<TuiRogGame::Domain::Event::DomainEvent>> GameEngine:
     }
 
     if (active_description_port) {
-        std::string generated_description = active_description_port->generateDescription(new_pos);
+        Port::Out::GameStateDTO current_game_state(*map_, *player_);
+        std::string generated_description = active_description_port->generateDescription(current_game_state);
         events.push_back(std::make_unique<Domain::Event::DescriptionGeneratedEvent>(generated_description));
         spdlog::info("GameEngine: DescriptionGeneratedEvent created.");
     }

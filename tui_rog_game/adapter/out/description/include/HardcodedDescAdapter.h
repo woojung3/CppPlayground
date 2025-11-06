@@ -2,6 +2,7 @@
 #define TUI_ROG_GAME_ADAPTER_OUT_DESCRIPTION_HARDCODEDDESCADAPTER_H
 
 #include "IGenerateDescriptionPort.h"
+#include "GameStateDTO.h" // GameStateDTO를 포함
 #include <string>
 
 namespace TuiRogGame {
@@ -17,7 +18,7 @@ namespace TuiRogGame {
                     HardcodedDescAdapter() = default;
                     ~HardcodedDescAdapter() override = default;
 
-                    std::string generateDescription(const TuiRogGame::Domain::Model::Position& player_position) override;
+                    std::string generateDescription(const Port::Out::GameStateDTO& game_state) override;
                 };
 
             } // namespace Description

@@ -1,7 +1,8 @@
 #ifndef TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_INMEMORYADAPTER_H
 #define TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_INMEMORYADAPTER_H
 
-#include "IPersistencePort.h"
+#include "ISaveGameStatePort.h"
+#include "ILoadGameStatePort.h"
 #include <optional>
 #include <memory>
 
@@ -10,20 +11,17 @@ namespace TuiRogGame {
         namespace Out {
             namespace Persistence {
 
-                // InMemoryAdapter is a concrete implementation of IPersistencePort
-                // that stores game data in memory. This is useful for testing
-                // and for initial development without a real database.
-                class InMemoryAdapter : public Port::Out::IPersistencePort {
+                class InMemoryAdapter : public Port::Out::ISaveGameStatePort, public Port::Out::ILoadGameStatePort {
                 public:
                     InMemoryAdapter() = default;
                     ~InMemoryAdapter() override = default;
 
                     // Saves the full game state to an in-memory store.
-                    void saveGame(const TuiRogGame::Port::Out::GameStateDTO& gameState) override;
+                    void saveGameState(const TuiRogGame::Port::Out::GameStateDTO& gameState) override;
 
                     // Loads the full game state from the in-memory store.
                     // Returns a unique_ptr to a new GameStateDTO object, or nullptr if no game was saved.
-                    std::unique_ptr<TuiRogGame::Port::Out::GameStateDTO> loadGame() override;
+                    std::unique_ptr<TuiRogGame::Port::Out::GameStateDTO> loadGameState() override;
 
                 private:
                     // Stores the last saved game state. Using std::optional to represent

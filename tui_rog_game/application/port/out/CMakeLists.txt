@@ -1,7 +1,7 @@
 add_library(port_out STATIC
     include/IGenerateDescriptionPort.h
-    include/IPersistencePort.h
-    include/IRenderPort.h
+    include/ISaveGameStatePort.h
+    include/ILoadGameStatePort.h
 )
 
 # 네임스페이스 별칭을 생성합니다.

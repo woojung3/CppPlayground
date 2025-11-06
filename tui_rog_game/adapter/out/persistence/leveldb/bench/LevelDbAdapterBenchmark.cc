@@ -1,6 +1,7 @@
 #include <benchmark/benchmark.h>
 #include "LevelDbAdapter.h"
-#include "IPersistencePort.h"
+#include "ISaveGameStatePort.h"
+#include "ILoadGameStatePort.h"
 #include "GameStateDTO.h"
 #include "Player.h"
 #include "Map.h"
@@ -101,7 +102,7 @@ protected:
 
 BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_SaveGame_Direct)(benchmark::State& state) {
     for (auto _ : state) {
-        adapter_->saveGame(*dummy_game_state_);
+        adapter_->saveGameState(*dummy_game_state_);
     }
 
     addCounters(state, state.iterations());
@@ -109,9 +110,9 @@ BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_SaveGame_Direct)(benchmark:
 
 BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_LoadGame_Direct)(benchmark::State& state) {
     // Pre-save a game state to load
-    adapter_->saveGame(*dummy_game_state_);
+    adapter_->saveGameState(*dummy_game_state_);
     for (auto _ : state) {
-        std::unique_ptr<Port::Out::GameStateDTO> loaded_state = adapter_->loadGame();
+        std::unique_ptr<Port::Out::GameStateDTO> loaded_state = adapter_->loadGameState();
         benchmark::DoNotOptimize(loaded_state); // Prevent compiler from optimizing away the load
     }
 
@@ -121,9 +122,9 @@ BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_LoadGame_Direct)(benchmark:
 // --- Benchmarks for IPersistencePort usage ---
 
 BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_SaveGame_Port)(benchmark::State& state) {
-    Port::Out::IPersistencePort* port = adapter_.get(); // Use the port interface
+    Port::Out::ISaveGameStatePort* save_port = adapter_.get(); // Use the save port interface
     for (auto _ : state) {
-        port->saveGame(*dummy_game_state_);
+        save_port->saveGameState(*dummy_game_state_);
     }
 
     addCounters(state, state.iterations());
@@ -131,10 +132,10 @@ BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_SaveGame_Port)(benchmark::S
 
 BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_LoadGame_Port)(benchmark::State& state) {
     // Pre-save a game state to load
-    adapter_->saveGame(*dummy_game_state_);
-    Port::Out::IPersistencePort* port = adapter_.get(); // Use the port interface
+    adapter_->saveGameState(*dummy_game_state_);
+    Port::Out::ILoadGameStatePort* load_port = adapter_.get(); // Use the load port interface
     for (auto _ : state) {
-        std::unique_ptr<Port::Out::GameStateDTO> loaded_state = port->loadGame();
+        std::unique_ptr<Port::Out::GameStateDTO> loaded_state = load_port->loadGameState();
         benchmark::DoNotOptimize(loaded_state); // Prevent compiler from optimizing away the load
     }
 

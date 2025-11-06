@@ -4,7 +4,8 @@
 #include "DomainEvent.h"
 #include "IGetPlayerActionUseCase.h"
 #include "IRenderPort.h"
-#include "IPersistencePort.h"
+#include "ISaveGameStatePort.h"
+#include "ILoadGameStatePort.h"
 #include "IGenerateDescriptionPort.h"
 
 #include <vector>
@@ -19,7 +20,8 @@ namespace Service {
 class GameEngine : public Port::In::IGetPlayerActionUseCase {
 public:
     GameEngine(
-        std::unique_ptr<Port::Out::IPersistencePort> persistence_port,
+        std::shared_ptr<Port::Out::ISaveGameStatePort> save_port,
+        std::shared_ptr<Port::Out::ILoadGameStatePort> load_port,
         std::unique_ptr<Port::Out::IGenerateDescriptionPort> primary_description_port,
         std::unique_ptr<Port::Out::IGenerateDescriptionPort> alternative_description_port
     );
@@ -34,7 +36,8 @@ private:
     void processEvents(const std::vector<std::unique_ptr<Domain::Event::DomainEvent>>& events);
 
     bool is_running_ = false;
-    std::unique_ptr<Port::Out::IPersistencePort> persistence_port_;
+    std::shared_ptr<Port::Out::ISaveGameStatePort> save_port_;
+    std::shared_ptr<Port::Out::ILoadGameStatePort> load_port_;
     std::unique_ptr<Port::Out::IGenerateDescriptionPort> primary_description_port_; // Renamed
     std::unique_ptr<Port::Out::IGenerateDescriptionPort> alternative_description_port_; // New
     bool use_alternative_description_port_ = false; // New flag

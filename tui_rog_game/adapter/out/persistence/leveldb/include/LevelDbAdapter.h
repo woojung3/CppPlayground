@@ -1,8 +1,8 @@
 #ifndef TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_LEVELDBADAPTER_H
 #define TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_LEVELDBADAPTER_H
 
-#include "IPersistencePort.h"
-#include "GameStateDTO.h"
+#include "ISaveGameStatePort.h"
+#include "ILoadGameStatePort.h"
 #include <string>
 #include <memory> // For std::unique_ptr
 
@@ -11,13 +11,13 @@ namespace TuiRogGame {
         namespace Out {
             namespace Persistence {
 
-                class LevelDbAdapter : public Port::Out::IPersistencePort {
+                class LevelDbAdapter : public Port::Out::ISaveGameStatePort, public Port::Out::ILoadGameStatePort {
                 public:
                     explicit LevelDbAdapter(const std::string& db_path);
                     ~LevelDbAdapter() override;
 
-                    void saveGame(const Port::Out::GameStateDTO& game_state) override;
-                    std::unique_ptr<Port::Out::GameStateDTO> loadGame() override;
+                    void saveGameState(const Port::Out::GameStateDTO& game_state) override;
+                    std::unique_ptr<Port::Out::GameStateDTO> loadGameState() override;
 
                 private:
                     struct Impl; // Forward-declaration of the implementation struct

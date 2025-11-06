@@ -36,8 +36,8 @@ ftxui::Element TileToElement(Domain::Model::Tile tile) {
     }
 }
 
-TuiAdapter::TuiAdapter(Port::In::IGetPlayerActionUseCase& game_engine, ftxui::ScreenInteractive& screen)
-    : game_engine_(game_engine), screen_(screen), game_state_ptr_(std::make_shared<std::optional<Port::Out::GameStateDTO>>(std::nullopt)) {
+TuiAdapter::TuiAdapter(std::shared_ptr<Port::In::IGetPlayerActionUseCase> game_engine, ftxui::ScreenInteractive& screen)
+    : game_engine_(std::move(game_engine)), screen_(screen), game_state_ptr_(std::make_shared<std::optional<Port::Out::GameStateDTO>>(std::nullopt)) {
     spdlog::info("TuiAdapter initialized.");
     message_log_.push_back("Welcome to TUI-ROG!");
 }
@@ -265,7 +265,7 @@ void TuiAdapter::run() {
     auto component = CatchEvent(renderer, [&](Event event) {
         if (show_start_screen_) {
             show_start_screen_ = false; // Dismiss start screen on any key press
-            game_engine_.handlePlayerAction(Port::In::PlayerActionCommand(Port::In::PlayerActionCommand::INITIALIZE)); // Initialize game after dismissing start screen
+            game_engine_->handlePlayerAction(Port::In::PlayerActionCommand(Port::In::PlayerActionCommand::INITIALIZE)); // Initialize game after dismissing start screen
             return true;
         }
 
@@ -290,7 +290,7 @@ void TuiAdapter::run() {
                     command = Port::In::PlayerActionCommand(Port::In::PlayerActionCommand::USE_ITEM, "Health Potion");
                     break;
                 case 'm': // Toggle description model
-                    game_engine_.toggleDescriptionPort();
+                    game_engine_->toggleDescriptionPort();
                     message_log_.push_back("Description model toggled.");
                     return true; // Event handled, no further action needed for game_engine_
                 case 'q': screen_.Exit(); return true;
@@ -298,14 +298,14 @@ void TuiAdapter::run() {
                     spdlog::warn("Unknown input character: {}", input);
                     return false; // Event not handled by game logic, return false
             }
-            game_engine_.handlePlayerAction(command);
+            game_engine_->handlePlayerAction(command);
             return true; // Event handled by game logic
         }
         return false; // Event not a character event, return false
     });
 
     // Send initialize command to load initial game state
-    game_engine_.handlePlayerAction(Port::In::PlayerActionCommand(Port::In::PlayerActionCommand::INITIALIZE));
+    game_engine_->handlePlayerAction(Port::In::PlayerActionCommand(Port::In::PlayerActionCommand::INITIALIZE));
 
     // Flickering 방지를 위한 설정
     screen_.SetCursor(ftxui::Screen::Cursor{0, 0});
