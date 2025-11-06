@@ -6,13 +6,12 @@
 #include "ApplicationBuilder.h"
 
 int main() {
-  // Configure spdlog to write to a file
+
   try {
     auto file_logger = spdlog::basic_logger_mt("file_logger", "game.log");
     spdlog::set_default_logger(file_logger);
-    spdlog::set_level(spdlog::level::debug); // Set desired log level
-    spdlog::flush_on(
-        spdlog::level::info); // Flush logs immediately for info and above
+    spdlog::set_level(spdlog::level::debug);
+    spdlog::flush_on(spdlog::level::info);
   } catch (const spdlog::spdlog_ex &ex) {
     std::cerr << "Log initialization failed: " << ex.what() << std::endl;
     return 1;

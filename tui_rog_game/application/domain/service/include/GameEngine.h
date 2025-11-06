@@ -7,11 +7,10 @@
 #include "IRenderPort.h"
 #include "ISaveGameStatePort.h"
 #include "Player.h"
-
 #include "Map.h"
-#include <functional> // For std::reference_wrapper
+#include <functional>
 #include <memory>
-#include <optional> // For std::optional
+#include <optional>
 #include <vector>
 
 namespace TuiRogGame {
@@ -32,7 +31,7 @@ public:
   handlePlayerAction(const Port::In::PlayerActionCommand &command) override;
 
 private:
-  // Initializes the game state (player, map, etc.) and returns initial events.
+
   std::vector<std::unique_ptr<Domain::Event::DomainEvent>> initializeGame();
   std::vector<std::unique_ptr<Domain::Event::DomainEvent>>
   processPlayerMove(int dx, int dy);
@@ -43,18 +42,17 @@ private:
   std::shared_ptr<Port::Out::ISaveGameStatePort> save_port_;
   std::shared_ptr<Port::Out::ILoadGameStatePort> load_port_;
   std::unique_ptr<Port::Out::IGenerateDescriptionPort>
-      primary_description_port_; // Renamed
+      primary_description_port_;
   std::unique_ptr<Port::Out::IGenerateDescriptionPort>
-      alternative_description_port_;              // New
-  bool use_alternative_description_port_ = false; // New flag
+      alternative_description_port_;
+  bool use_alternative_description_port_ = false;
   Port::Out::IRenderPort *render_port_ = nullptr;
 
   std::unique_ptr<Model::Player> player_;
   std::unique_ptr<Model::Map> map_;
-  std::optional<std::reference_wrapper<Model::Enemy>>
-      current_enemy_; // To track the enemy in combat
+  std::optional<std::reference_wrapper<Model::Enemy>> current_enemy_;
 
-public: // Added public method for toggling
+public:
   void toggleDescriptionPort();
 };
 

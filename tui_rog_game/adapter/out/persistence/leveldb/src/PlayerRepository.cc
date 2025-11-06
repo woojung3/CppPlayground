@@ -1,7 +1,7 @@
 #include "PlayerRepository.h"
 #include "LevelDbProvider.h"
-#include <algorithm> // For std::transform
-#include <cctype>    // For std::tolower
+#include <algorithm>
+#include <cctype>
 #include <spdlog/spdlog.h>
 
 namespace TuiRogGame {
@@ -23,11 +23,10 @@ nlohmann::json PlayerRepository::serializePlayerNonStandard(
   nlohmann::json j;
   j["id"] = player.getId();
 
-  // Serialize inventory: store only item IDs
   nlohmann::json inventory_ids_json = nlohmann::json::array();
   for (const auto &item_ptr : player.getInventory()) {
-    // Assuming Item has a way to get a unique ID for persistence
-    // For now, let's use item name as a placeholder ID. This needs refinement.
+
+
     inventory_ids_json.push_back(
         item_ptr->getName()); // Placeholder for item ID
   }
@@ -56,10 +55,9 @@ std::vector<std::string> PlayerRepository::deserializePlayerInventoryItemIds(
 
 void PlayerRepository::saveForBatch(const std::string &key,
                                     const Domain::Model::Player &player) {
-  // Key convention: player:id
+
   std::string base_key = toLower(key); // e.g., "player:main_player"
 
-  // Save standard layout parts using CrudRepository
   Domain::Model::PlayerCoreStats core_stats = {player.getLevel(),
                                                player.getXp(), player.getHp()};
   player_core_stats_crud_.saveForBatch(base_key + ":core_stats", core_stats);
@@ -67,7 +65,6 @@ void PlayerRepository::saveForBatch(const std::string &key,
   player_position_crud_.saveForBatch(base_key + ":position",
                                      player.getPosition());
 
-  // Save non-standard layout parts (id and inventory item IDs) as JSON
   nlohmann::json j = serializePlayerNonStandard(player);
   LevelDbProvider::getInstance().addToBatch(base_key + ":non_standard",
                                             j.dump());
@@ -75,10 +72,9 @@ void PlayerRepository::saveForBatch(const std::string &key,
       "PlayerRepository: Added non-standard parts for key '{}' to batch.",
       base_key);
 
-  // Save each item in the inventory using ItemRepository
   int item_index = 0;
   for (const auto &item_ptr : player.getInventory()) {
-    // Key convention: player:id:inventory:item_index
+
     item_repo_.saveForBatch(
         base_key + ":inventory:" + std::to_string(item_index), *item_ptr);
     item_index++;
@@ -92,7 +88,6 @@ std::optional<Domain::Model::Player>
 PlayerRepository::findById(const std::string &key) {
   std::string base_key = toLower(key);
 
-  // Load standard layout parts
   auto core_stats_opt =
       player_core_stats_crud_.findById(base_key + ":core_stats");
   auto stats_opt = player_stats_crud_.findById(base_key + ":stats");
@@ -105,7 +100,6 @@ PlayerRepository::findById(const std::string &key) {
     return std::nullopt;
   }
 
-  // Load non-standard layout parts (id and inventory item IDs) from JSON
   auto &provider = LevelDbProvider::getInstance();
   auto non_standard_json_str_opt = provider.Get(base_key + ":non_standard");
   if (!non_standard_json_str_opt) {
@@ -127,7 +121,6 @@ PlayerRepository::findById(const std::string &key) {
       return std::nullopt;
     }
 
-    // Load inventory items first
     std::vector<std::unique_ptr<Domain::Model::Item>> loaded_inventory_items;
     int item_index = 0;
     for (const std::string &item_id : inventory_item_ids) {
@@ -145,7 +138,6 @@ PlayerRepository::findById(const std::string &key) {
       item_index++;
     }
 
-    // Reconstruct Player object using the new constructor
     Domain::Model::Player player(id_opt.value(), core_stats_opt.value(),
                                  stats_opt.value(), position_opt.value(),
                                  std::move(loaded_inventory_items));
@@ -166,18 +158,15 @@ void PlayerRepository::deleteById(const std::string &key) {
   auto &provider = LevelDbProvider::getInstance();
   std::string base_key = toLower(key);
 
-  // Delete standard layout parts
   player_core_stats_crud_.deleteById(base_key + ":core_stats");
   player_stats_crud_.deleteById(base_key + ":stats");
   player_position_crud_.deleteById(base_key + ":position");
 
-  // Delete non-standard layout parts
   provider.Delete(base_key + ":non_standard");
 
-  // Delete inventory items (this requires iterating through keys or knowing
-  // item IDs) For now, this is a placeholder. A more robust solution would
-  // involve storing a list of item keys with the player's non-standard data.
-  // For simplicity, we'll assume we only delete the player's main data.
+
+
+
   spdlog::warn("PlayerRepository: Inventory items for player '{}' are not "
                "deleted during player deletion. Manual cleanup needed.",
                base_key);

@@ -1,7 +1,7 @@
 #include "EnemyRepository.h"
 #include "LevelDbProvider.h"
-#include <algorithm> // For std::transform
-#include <cctype>    // For std::tolower
+#include <algorithm>
+#include <cctype>
 #include <spdlog/spdlog.h>
 
 namespace TuiRogGame {
@@ -20,7 +20,7 @@ std::string EnemyRepository::toLower(std::string s) const {
 nlohmann::json
 EnemyRepository::serializeEnemy(const Domain::Model::Enemy &enemy) const {
   nlohmann::json j;
-  j["type_name"] = enemy.getTypeName(); // Store type name as string
+  j["type_name"] = enemy.getTypeName();
   j["name"] = enemy.getName();
   j["health"] = enemy.getHealth();
   j["stats"]["strength"] = enemy.getStats().strength;
@@ -63,18 +63,8 @@ EnemyRepository::deserializeEnemy(const nlohmann::json &j) const {
         return nullptr;
       }
 
-      // After construction, update common properties like health and stats
-      // Note: Derived class constructors set initial stats and health. We need
-      // to override if persisted values differ. For simplicity, we'll assume
-      // the name and stats from JSON are the source of truth. This might
-      // require adding setters to the Enemy base class or derived classes. For
-      // now, we'll directly set the health_ and stats_ if possible, or rely on
-      // the constructor. A more robust solution would involve passing stats and
-      // name to the derived constructors. For this refactoring, we'll assume
-      // the derived constructors set the base stats and name, and we only need
-      // to update the current health.
       if (enemy_ptr) {
-        enemy_ptr->stats_.health = health; // Directly set health in stats_
+        enemy_ptr->stats_.health = health;
       }
 
       return enemy_ptr;
@@ -105,7 +95,7 @@ EnemyRepository::findById(const std::string &key) {
   auto value_str_opt = provider.Get(lower_key);
 
   if (!value_str_opt) {
-    return nullptr; // Not found or error already logged by provider
+    return nullptr;
   }
 
   try {

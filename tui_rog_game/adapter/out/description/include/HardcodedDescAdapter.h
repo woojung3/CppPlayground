@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameStateDTO.h" // GameStateDTO를 포함
+#include "GameStateDTO.h"
 #include "IGenerateDescriptionPort.h"
 #include <string>
 
@@ -9,9 +9,8 @@ namespace Adapter {
 namespace Out {
 namespace Description {
 
-// HardcodedDescAdapter is a concrete implementation of IGenerateDescriptionPort
-// that provides hardcoded descriptions based on simple logic.
-// This is useful for initial development and testing.
+
+
 class HardcodedDescAdapter : public Port::Out::IGenerateDescriptionPort {
 public:
   HardcodedDescAdapter() = default;

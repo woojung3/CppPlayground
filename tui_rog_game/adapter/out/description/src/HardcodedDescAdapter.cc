@@ -14,7 +14,6 @@ std::string HardcodedDescAdapter::generateDescription(
 
   std::string description = "";
 
-  // 플레이어 위치 기반 묘사
   if (player_position.x == 0 && player_position.y == 0) {
     description += "어둡고 축축한 던전 입구에 서 있습니다. 차가운 바람이 "
                    "안쪽에서 불어옵니다. ";
@@ -25,12 +24,10 @@ std::string HardcodedDescAdapter::generateDescription(
     description += "평범한 던전 복도입니다. 특별한 것은 보이지 않습니다. ";
   }
 
-  // 주변 환경 정보 추가
   std::vector<std::string> nearby_elements;
   int px = player_position.x;
   int py = player_position.y;
 
-  // 주변 1칸 이내 탐색
   for (int dy = -1; dy <= 1; ++dy) {
     for (int dx = -1; dx <= 1; ++dx) {
       if (dx == 0 && dy == 0)

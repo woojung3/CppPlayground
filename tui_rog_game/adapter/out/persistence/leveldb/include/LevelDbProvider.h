@@ -4,11 +4,10 @@
 #include <optional>
 #include <string>
 
-// Forward-declare LevelDB types to avoid including the header here.
 namespace leveldb {
 class DB;
 class WriteBatch;
-} // namespace leveldb
+}
 
 namespace TuiRogGame {
 namespace Adapter {
@@ -19,12 +18,10 @@ class LevelDbProvider {
 public:
   static LevelDbProvider &getInstance();
 
-  // Immediate (non-batched) operations
   std::optional<std::string> Get(const std::string &key);
   bool Put(const std::string &key, const std::string &value);
   bool Delete(const std::string &key);
 
-  // Unit of Work (batched) operations
   void startBatch();
   void addToBatch(const std::string &key, const std::string &value);
   void deleteFromBatch(const std::string &key);

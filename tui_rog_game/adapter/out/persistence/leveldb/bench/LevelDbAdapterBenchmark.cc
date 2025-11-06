@@ -12,8 +12,7 @@
 #include "Position.h"
 #include "Stats.h"
 #include <benchmark/benchmark.h>
-
-#include <filesystem> // For creating and removing temporary directories
+#include <filesystem>
 #include <memory>
 #include <spdlog/spdlog.h>
 #include <string>
@@ -30,15 +29,13 @@ void addCounters(benchmark::State &state, uint64_t cnt) {
 namespace TuiRogGame {
 namespace Benchmark {
 
-// Global initializer to turn off logging for benchmarks
 struct BenchmarkInitializer {
   BenchmarkInitializer() { spdlog::set_level(spdlog::level::off); }
 };
 static BenchmarkInitializer benchmark_initializer;
 
-// Helper function to create a dummy GameStateDTO
 Port::Out::GameStateDTO createDummyGameState() {
-  // Create Player
+
   Domain::Model::Stats playerStats{20, 15, 10, 25};
   Domain::Model::Position playerPos{5, 5};
   Domain::Model::PlayerCoreStats playerCoreStats{10, 1500,
@@ -52,14 +49,13 @@ Port::Out::GameStateDTO createDummyGameState() {
   Domain::Model::Player player("player1", playerCoreStats, playerStats,
                                playerPos, std::move(playerInventory));
 
-  // Create Map
   int mapWidth = 50;
   int mapHeight = 50;
   Domain::Model::Position startPlayerPos{0, 0};
   std::vector<std::vector<Domain::Model::Tile>> tiles(
       mapHeight,
       std::vector<Domain::Model::Tile>(mapWidth, Domain::Model::Tile::FLOOR));
-  // Add some walls
+
   for (int i = 0; i < mapWidth; ++i) {
     tiles[0][i] = Domain::Model::Tile::WALL;
     tiles[mapHeight - 1][i] = Domain::Model::Tile::WALL;
@@ -72,8 +68,8 @@ Port::Out::GameStateDTO createDummyGameState() {
 
   std::map<Domain::Model::Position, std::unique_ptr<Domain::Model::Enemy>>
       enemies;
-  // Domain::Model::Stats goblinStats{5, 5, 0, 10}; // No longer needed as stats
-  // are in Goblin constructor
+
+
   enemies.emplace(
       Domain::Model::Position{1, 1},
       std::make_unique<Domain::Model::Goblin>(Domain::Model::Position{1, 1}));
@@ -94,7 +90,6 @@ Port::Out::GameStateDTO createDummyGameState() {
   return Port::Out::GameStateDTO(std::move(gameMap), std::move(player));
 }
 
-// Fixture for LevelDbAdapter benchmarks
 class LevelDbAdapterFixture : public benchmark::Fixture {
 public:
   void SetUp(const ::benchmark::State &state) override {
@@ -117,7 +112,6 @@ protected:
   std::unique_ptr<Port::Out::GameStateDTO> dummy_game_state_;
 };
 
-// --- Benchmarks for direct LevelDbAdapter usage ---
 
 BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_SaveGame_Direct)
 (benchmark::State &state) {
@@ -130,7 +124,7 @@ BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_SaveGame_Direct)
 
 BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_LoadGame_Direct)
 (benchmark::State &state) {
-  // Pre-save a game state to load
+
   adapter_->saveGameState(*dummy_game_state_);
   for (auto _ : state) {
     std::unique_ptr<Port::Out::GameStateDTO> loaded_state =
@@ -142,7 +136,6 @@ BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_LoadGame_Direct)
   addCounters(state, state.iterations());
 }
 
-// --- Benchmarks for IPersistencePort usage ---
 
 BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_SaveGame_Port)
 (benchmark::State &state) {
@@ -157,7 +150,7 @@ BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_SaveGame_Port)
 
 BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_LoadGame_Port)
 (benchmark::State &state) {
-  // Pre-save a game state to load
+
   adapter_->saveGameState(*dummy_game_state_);
   Port::Out::ILoadGameStatePort *load_port =
       adapter_.get(); // Use the load port interface

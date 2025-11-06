@@ -1,27 +1,26 @@
 #include "Player.h"
-#include <memory> // std::unique_ptr를 위해 추가
+#include <memory>
 
 namespace TuiRogGame {
 namespace Domain {
 namespace Model {
 
 namespace {
-// Helper function to calculate max HP from stats
+
 int calculateMaxHp(const Stats &stats) { return stats.vitality * 10; }
 } // namespace
 
 Player::Player(PlayerId id, Stats stats, Position position)
     : id_(std::move(id)), stats_(stats), position_(position) {
-  hp_ = getMaxHp(); // Start with full health
+  hp_ = getMaxHp();
 }
 
-// New constructor for persistence
 Player::Player(PlayerId id, PlayerCoreStats core_stats, Stats stats,
                Position position, std::vector<std::unique_ptr<Item>> inventory)
     : id_(std::move(id)), level_(core_stats.level), xp_(core_stats.xp),
       hp_(core_stats.hp), stats_(stats), position_(position),
       inventory_(std::move(inventory)) {
-  // No need to calculate max HP here, as hp_ is directly loaded
+
 }
 
 Player::Player(const Player &other)
@@ -35,7 +34,7 @@ Player::Player(const Player &other)
 int Player::getMaxHp() const { return calculateMaxHp(stats_); }
 
 int Player::getAttackPower() const {
-  // Example: 5 base attack + 2 attack per strength point
+
   return 5 + (stats_.strength * 2);
 }
 
@@ -45,18 +44,16 @@ bool Player::gainXp(int amount) {
   xp_ += amount;
 
   bool leveled_up = false;
-  // Level up condition
+
   while (xp_ >= 100 * level_) {
     xp_ -= 100 * level_;
     level_++;
 
-    // Increase stats
     stats_.strength++;
     stats_.dexterity++;
     stats_.intelligence++;
     stats_.vitality++;
 
-    // Recalculate max_hp and heal to full
     hp_ = getMaxHp();
 
     leveled_up = true;
@@ -78,18 +75,17 @@ void Player::addItem(std::unique_ptr<Item> item) {
 bool Player::useItem(const std::string &item_name) {
   for (auto it = inventory_.begin(); it != inventory_.end(); ++it) {
     if ((*it)->getName() == item_name) {
-      // Found the item, apply its effect
-      if ((*it)->getType() == Item::ItemType::HealthPotion) {
-        hp_ = std::min(hp_ + 20,
-                       getMaxHp()); // Restore 20 HP, not exceeding max HP
-      }
-      // Add other item effects here
 
-      inventory_.erase(it); // Remove item from inventory
+      if ((*it)->getType() == Item::ItemType::HealthPotion) {
+        hp_ = std::min(hp_ + 20, getMaxHp());
+      }
+
+
+      inventory_.erase(it);
       return true;
     }
   }
-  return false; // Item not found or could not be used
+  return false;
 }
 
 } // namespace Model

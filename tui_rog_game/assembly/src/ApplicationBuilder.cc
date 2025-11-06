@@ -3,11 +3,11 @@
 #include <memory>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
-
 #include "GameEngine.h"
 #include "HardcodedDescAdapter.h"
 #include "ILoadGameStatePort.h"
 #include "ISaveGameStatePort.h"
+#include "InMemoryAdapter.h"
 #include "LevelDbAdapter.h"
 #include "LlmAdapter.h"
 #include "TuiAdapter.h"
@@ -22,6 +22,9 @@ TuiRogGame::Assembly::ApplicationBuilder::build(
   auto persistence_adapter =
       std::make_shared<Adapter::Out::Persistence::LevelDbAdapter>(
           "./game_data.db");
+//  auto persistence_adapter =
+//      std::make_shared<Adapter::Out::Persistence::InMemoryAdapter>();
+
   auto hardcoded_desc_adapter =
       std::make_unique<Adapter::Out::Description::HardcodedDescAdapter>();
   auto chatgpt_desc_adapter =

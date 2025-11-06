@@ -8,10 +8,9 @@ namespace TuiRogGame {
 namespace Domain {
 namespace Event {
 
-// Concrete event for item found
 class ItemFoundEvent : public DomainEvent {
 public:
-  // Redefine ItemType for the event to avoid direct dependency on model/Item.h
+
   enum class ItemType { HealthPotion, StrengthScroll };
 
   explicit ItemFoundEvent(ItemType item_type, const std::string &item_name,

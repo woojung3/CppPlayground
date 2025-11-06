@@ -1,16 +1,16 @@
 #include "TuiAdapter.h"
 #include "CombatStartedEvent.h"
-#include "DescriptionGeneratedEvent.h" // New
-#include "EnemyAttackedEvent.h"        // New
-#include "EnemyDefeatedEvent.h"        // New
+#include "DescriptionGeneratedEvent.h"
+#include "EnemyAttackedEvent.h"
+#include "EnemyDefeatedEvent.h"
 #include "ItemFoundEvent.h"
-#include "ItemUsedEvent.h" // New
+#include "ItemUsedEvent.h"
 #include "Map.h"
 #include "Player.h"
-#include "PlayerAttackedEvent.h"  // New
-#include "PlayerLeveledUpEvent.h" // New
+#include "PlayerAttackedEvent.h"
+#include "PlayerLeveledUpEvent.h"
 #include "PlayerMovedEvent.h"
-#include <algorithm> // For std::min
+#include <algorithm>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/event.hpp>
 #include <ftxui/component/screen_interactive.hpp>
@@ -24,7 +24,6 @@ namespace Adapter {
 namespace In {
 namespace Tui {
 
-// Helper to convert domain Tile to ftxui Element
 ftxui::Element TileToElement(Domain::Model::Tile tile) {
   switch (tile) {
   case Domain::Model::Tile::WALL:
@@ -56,10 +55,10 @@ void TuiAdapter::run() {
   spdlog::info("TuiAdapter::run() started.");
   using namespace ftxui;
 
-  auto renderer = Renderer([&] { // Capture this by reference for
-                                 // show_start_screen_
+  auto renderer = Renderer([&] {
+
     if (show_start_screen_) {
-      auto title = ftxui::text("TUI-ROG: AI Dungeon Master") | ftxui::bold |
+      auto title = ftxui::text("TUI-ROG: Dungeon Master") | ftxui::bold |
                    ftxui::center;
       auto instructions =
           ftxui::vbox({ftxui::text(""), ftxui::text("Controls:"),
@@ -70,7 +69,7 @@ void TuiAdapter::run() {
                        ftxui::text("  X: Attack (if enemy present)"),
                        ftxui::text("  U: Use Item (requires item name)"),
                        ftxui::text("  M: Toggle Description Model "
-                                   "(Hardcoded/AI)"), // Added M instruction
+                                   "(Hardcoded/AI)"),
                        ftxui::text("  Q: Quit"), ftxui::text(""),
                        ftxui::text("Press any key to start...") |
                            ftxui::center}) |
@@ -86,7 +85,6 @@ void TuiAdapter::run() {
     const auto &map = state.map;
     const auto &player = state.player;
 
-    // Helper to render a map view (main map or mini-map)
     auto render_map_elements =
         [&](const Domain::Model::Map &current_map,
             const Domain::Model::Player &current_player) {
@@ -110,10 +108,8 @@ void TuiAdapter::run() {
       auto px = player.getPosition().x;
       auto py = player.getPosition().y;
 
-      // 현재 타일과 상하좌우 인접 타일 확인
       auto current_tile = map.getTile(px, py);
 
-      // 상하좌우 타일 검사 (우선순위: Enemy > Item > Exit)
       std::vector<std::pair<int, int>> adjacent = {
           {px, py - 1}, // 위
           {px, py + 1}, // 아래
@@ -123,7 +119,6 @@ void TuiAdapter::run() {
 
       Domain::Model::Tile display_tile = current_tile;
 
-      // 우선순위에 따라 표시할 타일 결정
       for (const auto &pos : adjacent) {
         if (pos.first >= 0 && pos.first < map.getWidth() && pos.second >= 0 &&
             pos.second < map.getHeight()) {
@@ -194,7 +189,6 @@ void TuiAdapter::run() {
       }
     };
 
-    // ASCII Art View (top-left, flexible)
     auto ascii_art_view =
         vbox({
             text("Nearby") | ftxui::bold | ftxui::center, separator(),
@@ -202,7 +196,6 @@ void TuiAdapter::run() {
         }) |
         ftxui::vcenter | border | flex; // 수직 가운데 정렬
 
-    // Player Status/Avatar (top-right)
     auto stats_view = vbox(Elements{
         text("Player Stats") | ftxui::bold, separator(),
         text("HP: " + std::to_string(player.getHp()) + "/" +
@@ -225,12 +218,10 @@ void TuiAdapter::run() {
           return inventory_elements;
         }())});
 
-    // Mini-map (bottom-left, fixed height)
     auto mini_map_view = render_map_elements(map, player) | border |
                          ftxui::size(ftxui::HEIGHT, ftxui::EQUAL,
                                      map.getHeight() + 2); // +2 for border
 
-    // Message Log (bottom-right, fixed height)
     Elements log_lines;
     int start_index =
         std::max(0, (int)message_log_.size() - 5); // Display last 5 messages
@@ -240,7 +231,6 @@ void TuiAdapter::run() {
     }
     auto message_log_view = vbox(log_lines) | border | flex;
 
-    // Combine into final layout
     auto top_panel = hbox(Elements{
                          ascii_art_view, separator(),
                          stats_view | ftxui::size(ftxui::WIDTH, ftxui::EQUAL,
@@ -303,8 +293,8 @@ void TuiAdapter::run() {
         }
         break; // New control for attack
       case 'u':
-        // This needs a way to get item name from user. For now, let's assume a
-        // hardcoded item for testing.
+
+
         command = Port::In::PlayerActionCommand(
             Port::In::PlayerActionCommand::USE_ITEM, "Health Potion");
         break;
@@ -325,11 +315,9 @@ void TuiAdapter::run() {
     return false; // Event not a character event, return false
   });
 
-  // Send initialize command to load initial game state
   game_engine_->handlePlayerAction(
       Port::In::PlayerActionCommand(Port::In::PlayerActionCommand::INITIALIZE));
 
-  // Flickering 방지를 위한 설정
   screen_.SetCursor(ftxui::Screen::Cursor{0, 0});
 
   screen_.Loop(component);
@@ -341,7 +329,6 @@ void TuiAdapter::render(
     const std::vector<std::unique_ptr<Domain::Event::DomainEvent>> &events) {
   bool state_changed = false;
 
-  // 게임 상태가 실제로 변경되었는지 확인
   if (!game_state_ptr_->has_value() ||
       game_state_ptr_->value().player.getPosition().x !=
           game_state.player.getPosition().x ||
@@ -425,10 +412,8 @@ void TuiAdapter::render(
     }
     state_changed = true; // 이벤트가 있으면 무조건 업데이트
 
-    // Other events can be handled here
   }
 
-  // 상태가 변경되었을 때만 화면 업데이트
   if (state_changed) {
     screen_.PostEvent(ftxui::Event::Custom);
   }

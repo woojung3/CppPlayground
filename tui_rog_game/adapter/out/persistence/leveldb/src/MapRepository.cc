@@ -1,7 +1,7 @@
 #include "MapRepository.h"
 #include "LevelDbProvider.h"
-#include <algorithm> // For std::transform
-#include <cctype>    // For std::tolower
+#include <algorithm>
+#include <cctype>
 #include <spdlog/spdlog.h>
 
 namespace TuiRogGame {
@@ -23,7 +23,6 @@ nlohmann::json
 MapRepository::serializeMapNonStandard(const Domain::Model::Map &map) const {
   nlohmann::json j;
 
-  // Serialize tiles
   nlohmann::json tiles_json = nlohmann::json::array();
   for (int y = 0; y < map.getHeight(); ++y) {
     nlohmann::json row_json = nlohmann::json::array();
@@ -34,7 +33,6 @@ MapRepository::serializeMapNonStandard(const Domain::Model::Map &map) const {
   }
   j["tiles"] = tiles_json;
 
-  // Serialize enemies (store position and a unique ID for each enemy)
   nlohmann::json enemies_json = nlohmann::json::array();
   for (const auto &pair : map.getEnemies()) {
     enemies_json.push_back(
@@ -43,7 +41,6 @@ MapRepository::serializeMapNonStandard(const Domain::Model::Map &map) const {
   }
   j["enemies"] = enemies_json;
 
-  // Serialize items (store position and a unique ID for each item)
   nlohmann::json items_json = nlohmann::json::array();
   for (const auto &pair : map.getItems()) {
     items_json.push_back(
@@ -105,13 +102,11 @@ void MapRepository::saveForBatch(const std::string &key,
                                  const Domain::Model::Map &map) {
   std::string base_key = toLower(key);
 
-  // Save standard layout parts
   Domain::Model::MapDimensions dimensions = {map.getWidth(), map.getHeight()};
   map_dimensions_crud_.saveForBatch(base_key + ":dimensions", dimensions);
   map_start_position_crud_.saveForBatch(base_key + ":start_position",
                                         map.getStartPlayerPosition());
 
-  // Save non-standard layout parts (tiles, enemy/item IDs) as JSON
   nlohmann::json j = serializeMapNonStandard(map);
   LevelDbProvider::getInstance().addToBatch(base_key + ":non_standard",
                                             j.dump());
@@ -119,7 +114,6 @@ void MapRepository::saveForBatch(const std::string &key,
       "MapRepository: Added non-standard parts for key '{}' to batch.",
       base_key);
 
-  // Save enemies and items using their respective repositories
   for (const auto &pair : map.getEnemies()) {
     enemy_repo_.saveForBatch(base_key + ":enemies:" + pair.second->getName(),
                              *pair.second); // Using name as ID
@@ -136,7 +130,6 @@ std::optional<Domain::Model::Map>
 MapRepository::findById(const std::string &key) {
   std::string base_key = toLower(key);
 
-  // Load standard layout parts
   auto dimensions_opt = map_dimensions_crud_.findById(base_key + ":dimensions");
   auto start_pos_opt =
       map_start_position_crud_.findById(base_key + ":start_position");
@@ -147,7 +140,6 @@ MapRepository::findById(const std::string &key) {
     return std::nullopt;
   }
 
-  // Load non-standard layout parts (tiles, enemy/item IDs) from JSON
   auto &provider = LevelDbProvider::getInstance();
   auto non_standard_json_str_opt = provider.Get(base_key + ":non_standard");
   if (!non_standard_json_str_opt) {
@@ -171,7 +163,6 @@ MapRepository::findById(const std::string &key) {
       return std::nullopt;
     }
 
-    // Load enemies
     std::map<Domain::Model::Position, std::unique_ptr<Domain::Model::Enemy>>
         loaded_enemies;
     for (const auto &pair : enemy_ids_and_pos) {
@@ -185,7 +176,6 @@ MapRepository::findById(const std::string &key) {
       }
     }
 
-    // Load items
     std::map<Domain::Model::Position, std::unique_ptr<Domain::Model::Item>>
         loaded_items;
     for (const auto &pair : item_ids_and_pos) {
@@ -200,7 +190,6 @@ MapRepository::findById(const std::string &key) {
       }
     }
 
-    // Reconstruct Map object using the new constructor
     Domain::Model::Map map(dimensions_opt->width, dimensions_opt->height,
                            start_pos_opt.value(), tiles_opt.value(),
                            std::move(loaded_enemies), std::move(loaded_items));
@@ -220,11 +209,9 @@ void MapRepository::deleteById(const std::string &key) {
   auto &provider = LevelDbProvider::getInstance();
   std::string base_key = toLower(key);
 
-  // Delete standard layout parts
   map_dimensions_crud_.deleteById(base_key + ":dimensions");
   map_start_position_crud_.deleteById(base_key + ":start_position");
 
-  // Load non-standard parts to get enemy/item IDs for deletion
   auto non_standard_json_str_opt = provider.Get(base_key + ":non_standard");
   if (non_standard_json_str_opt) {
     try {
@@ -234,11 +221,10 @@ void MapRepository::deleteById(const std::string &key) {
       std::vector<std::pair<Domain::Model::Position, std::string>>
           item_ids_and_pos = deserializeMapItemIds(j);
 
-      // Delete enemies
       for (const auto &pair : enemy_ids_and_pos) {
         enemy_repo_.deleteById(base_key + ":enemies:" + pair.second);
       }
-      // Delete items
+
       for (const auto &pair : item_ids_and_pos) {
         item_repo_.deleteById(base_key + ":items:" + pair.second);
       }
@@ -249,7 +235,6 @@ void MapRepository::deleteById(const std::string &key) {
     }
   }
 
-  // Delete non-standard layout parts
   provider.Delete(base_key + ":non_standard");
   spdlog::debug("MapRepository: Deleted map '{}' and its entities.", base_key);
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameStateDTO.h" // GameStateDTO를 포함
+#include "GameStateDTO.h"
 #include <string>
 
 namespace TuiRogGame {

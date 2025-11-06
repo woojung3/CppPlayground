@@ -7,7 +7,6 @@ namespace TuiRogGame {
 namespace Domain {
 namespace Event {
 
-// Concrete event for combat started
 class CombatStartedEvent : public DomainEvent {
 public:
   explicit CombatStartedEvent(const std::string &enemy_type_name,

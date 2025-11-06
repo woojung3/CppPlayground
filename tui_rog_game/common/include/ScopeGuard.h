@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utility> // for forward
+#include <utility>
 
 namespace TuiRogGame {
 namespace Common {

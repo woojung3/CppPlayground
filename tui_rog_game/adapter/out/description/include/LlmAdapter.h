@@ -1,11 +1,11 @@
 #pragma once
 
-#include "GameStateDTO.h" // GameStateDTO를 포함
+#include "GameStateDTO.h"
 #include "IGenerateDescriptionPort.h"
 #include <memory>
 
 namespace httplib {
-class Client; // Forward declaration
+class Client;
 }
 
 namespace TuiRogGame {
@@ -16,13 +16,13 @@ namespace Description {
 class LlmAdapter : public Port::Out::IGenerateDescriptionPort {
 public:
   LlmAdapter();
-  ~LlmAdapter() override; // Add destructor
+  ~LlmAdapter() override;
   std::string
   generateDescription(const Port::Out::GameStateDTO &game_state) override;
 
 private:
-  struct Impl; // Forward declaration of the implementation struct
-  std::unique_ptr<Impl> impl_; // Pointer to implementation
+  struct Impl;
+  std::unique_ptr<Impl> impl_;
 };
 
 } // namespace Description

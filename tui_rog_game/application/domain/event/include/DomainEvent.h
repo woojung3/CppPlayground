@@ -7,33 +7,31 @@ namespace TuiRogGame {
 namespace Domain {
 namespace Event {
 
-// Base class for all domain events
 class DomainEvent {
 public:
-  // Enum to identify the type of event
+
   enum class Type {
     PlayerMoved,
     ItemFound,
     CombatStarted,
-    PlayerAttacked, // New event
-    EnemyAttacked,  // New event
-    EnemyDefeated,  // New event
-    ItemUsed,       // New event
+    PlayerAttacked,
+    EnemyAttacked,
+    EnemyDefeated,
+    ItemUsed,
     PlayerLeveledUp,
     PlayerDied,
     DescriptionGenerated,
     GameSaved,
     GameLoaded,
-    MapChanged, // New event
-    // Add other event types as needed
-    Unknown // Default or error type
+    MapChanged,
+    Unknown
   };
 
   virtual ~DomainEvent() = default;
   Type getType() const { return type_; }
   virtual std::string
-  toString() const = 0; // Pure virtual function for string representation
-                        // (e.g., for logging/display)
+  toString() const = 0;
+
 
 protected:
   DomainEvent(Type type) : type_(type) {}

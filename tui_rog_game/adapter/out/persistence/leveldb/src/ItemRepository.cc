@@ -1,7 +1,7 @@
 #include "ItemRepository.h"
 #include "LevelDbProvider.h"
-#include <algorithm> // For std::transform
-#include <cctype>    // For std::tolower
+#include <algorithm>
+#include <cctype>
 #include <spdlog/spdlog.h>
 
 namespace TuiRogGame {
@@ -20,7 +20,7 @@ std::string ItemRepository::toLower(std::string s) const {
 nlohmann::json
 ItemRepository::serializeItem(const Domain::Model::Item &item) const {
   nlohmann::json j;
-  j["type"] = static_cast<int>(item.getType()); // Store enum as int
+  j["type"] = static_cast<int>(item.getType());
   j["name"] = item.getName();
   return j;
 }
@@ -58,7 +58,7 @@ ItemRepository::findById(const std::string &key) {
   auto value_str_opt = provider.Get(lower_key);
 
   if (!value_str_opt) {
-    return std::nullopt; // Not found or error already logged by provider
+    return std::nullopt;
   }
 
   try {

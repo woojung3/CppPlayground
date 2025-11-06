@@ -1,11 +1,10 @@
 #pragma once
 
-#include <memory>            // For std::shared_ptr
-#include <nlohmann/json.hpp> // For JSON serialization
+#include <memory>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
-
-#include "Item.h" // Domain Model Item
+#include "Item.h"
 
 namespace TuiRogGame {
 namespace Adapter {
@@ -21,10 +20,9 @@ public:
   void deleteById(const std::string &key);
 
 private:
-  // Helper to convert string to lowercase
+
   std::string toLower(std::string s) const;
 
-  // Serialization/Deserialization helpers
   nlohmann::json serializeItem(const Domain::Model::Item &item) const;
   std::optional<Domain::Model::Item>
   deserializeItem(const nlohmann::json &j) const;

@@ -24,9 +24,6 @@ struct LevelDbAdapter::Impl {
 
 LevelDbAdapter::LevelDbAdapter(const std::string &db_path)
     : impl_(std::make_unique<Impl>()) {
-  // The provider is a singleton and will initialize the DB on first use.
-  // The db_path parameter is now implicitly handled by the provider.
-  // We could pass it to the provider on first call if needed.
   (void)db_path; // Mark as unused for now
 }
 

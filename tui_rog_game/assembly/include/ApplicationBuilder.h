@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TuiAdapter.h" // For TuiAdapter type, which has a run() method
+#include "TuiAdapter.h"
 #include <memory>
 
 namespace TuiRogGame {

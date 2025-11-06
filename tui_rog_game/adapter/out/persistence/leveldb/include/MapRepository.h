@@ -1,16 +1,15 @@
 #pragma once
 
-#include <memory>            // For std::shared_ptr
-#include <nlohmann/json.hpp> // For JSON serialization
+#include <memory>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
-
-#include "EnemyRepository.h"              // For Map's enemies
-#include "ItemRepository.h"               // For Map's items
-#include "Map.h"                          // Domain Model Map
-#include "MapDimensions.h"                // For Map's dimensions
-#include "Position.h"                     // For Map's start player position
-#include "StandardLayoutCrudRepository.h" // For standard layout parts
+#include "EnemyRepository.h"
+#include "ItemRepository.h"
+#include "Map.h"
+#include "MapDimensions.h"
+#include "Position.h"
+#include "StandardLayoutCrudRepository.h"
 
 namespace TuiRogGame {
 namespace Adapter {
@@ -27,25 +26,23 @@ public:
   void deleteById(const std::string &key);
 
 private:
-  EnemyRepository &enemy_repo_; // Dependency on EnemyRepository
-  ItemRepository &item_repo_;   // Dependency on ItemRepository
+  EnemyRepository &enemy_repo_;
+  ItemRepository &item_repo_;
 
   StandardLayoutCrudRepository<Domain::Model::MapDimensions>
       map_dimensions_crud_;
   StandardLayoutCrudRepository<Domain::Model::Position>
       map_start_position_crud_;
 
-  // Helper to convert string to lowercase
   std::string toLower(std::string s) const;
 
-  // Serialization/Deserialization helpers for Map's non-standard layout parts
   nlohmann::json serializeMapNonStandard(const Domain::Model::Map &map) const;
   std::optional<std::vector<std::vector<Domain::Model::Tile>>>
   deserializeMapTiles(const nlohmann::json &j) const;
   std::vector<std::pair<Domain::Model::Position, std::string>>
-  deserializeMapEnemyIds(const nlohmann::json &j) const; // Position, Enemy ID
+  deserializeMapEnemyIds(const nlohmann::json &j) const;
   std::vector<std::pair<Domain::Model::Position, std::string>>
-  deserializeMapItemIds(const nlohmann::json &j) const; // Position, Item ID
+  deserializeMapItemIds(const nlohmann::json &j) const;
 };
 
 } // namespace Persistence

@@ -7,7 +7,6 @@ namespace TuiRogGame {
 namespace Domain {
 namespace Event {
 
-// Concrete event for player movement
 class PlayerMovedEvent : public DomainEvent {
 public:
   explicit PlayerMovedEvent(

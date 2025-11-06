@@ -2,14 +2,14 @@
 
 #include "Position.h"
 #include "Stats.h"
-#include <memory> // Required for std::unique_ptr
+#include <memory>
 #include <string>
 
 namespace TuiRogGame {
 namespace Adapter {
 namespace Out {
 namespace Persistence {
-class EnemyRepository; // Forward declaration
+class EnemyRepository;
 } // namespace Persistence
 } // namespace Out
 } // namespace Adapter
@@ -18,27 +18,23 @@ namespace Domain {
 namespace Model {
 
 class Enemy {
-  friend class Adapter::Out::Persistence::
-      EnemyRepository; // Grant EnemyRepository access to protected members
+  friend class Adapter::Out::Persistence::EnemyRepository;
 public:
   Enemy(std::string name, std::string type_name, Stats stats,
         Position position);
-  virtual ~Enemy() =
-      default; // Virtual destructor for proper cleanup of derived classes
+  virtual ~Enemy() = default;
 
   virtual std::unique_ptr<Enemy> clone() const = 0;
 
-  // Getters
   const std::string &getName() const { return name_; }
-  virtual std::string getTypeName() const; // Made virtual
+  virtual std::string getTypeName() const;
   const Position &getPosition() const { return position_; }
-  int getHealth() const; // Declared, defined in .cc
+  int getHealth() const;
   const Stats &getStats() const { return stats_; }
-  int getAttackPower() const; // Declared, defined in .cc
+  int getAttackPower() const;
 
-  // Setters
   void setPosition(const Position &pos) { position_ = pos; }
-  void takeDamage(int damage); // Declared, defined in .cc
+  void takeDamage(int damage);
 
 protected:
   std::string name_;

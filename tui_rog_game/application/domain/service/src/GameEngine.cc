@@ -1,17 +1,17 @@
 #include "GameEngine.h"
 #include "CombatStartedEvent.h"
-#include "DescriptionGeneratedEvent.h" // New
-#include "EnemyAttackedEvent.h"        // New
-#include "EnemyDefeatedEvent.h"        // New
-#include "GameLoadedEvent.h"           // New
+#include "DescriptionGeneratedEvent.h"
+#include "EnemyAttackedEvent.h"
+#include "EnemyDefeatedEvent.h"
+#include "GameLoadedEvent.h"
 #include "ItemFoundEvent.h"
-#include "ItemUsedEvent.h"        // New
-#include "MapChangedEvent.h"      // New
-#include "PlayerAttackedEvent.h"  // New
-#include "PlayerDiedEvent.h"      // New
-#include "PlayerLeveledUpEvent.h" // New
+#include "ItemUsedEvent.h"
+#include "MapChangedEvent.h"
+#include "PlayerAttackedEvent.h"
+#include "PlayerDiedEvent.h"
+#include "PlayerLeveledUpEvent.h"
 #include "PlayerMovedEvent.h"
-#include <iostream> // For temporary output
+#include <iostream>
 #include <spdlog/spdlog.h>
 
 namespace TuiRogGame {
@@ -43,34 +43,30 @@ GameEngine::initializeGame() {
   if (load_port_) {
     auto loaded_game_state = load_port_->loadGameState();
     if (loaded_game_state) {
-      // Game loaded successfully
+
       map_ = std::make_unique<Model::Map>(loaded_game_state->map);
       player_ = std::make_unique<Model::Player>(loaded_game_state->player);
       events.push_back(
-          std::make_unique<Domain::Event::GameLoadedEvent>()); // Assuming
-                                                               // GameLoadedEvent
-                                                               // exists
+          std::make_unique<Domain::Event::GameLoadedEvent>());
+
       spdlog::info("Game loaded. Player: {} at ({}, {})", player_->getName(),
                    player_->getPosition().x, player_->getPosition().y);
       events.push_back(std::make_unique<Domain::Event::PlayerMovedEvent>(
-          player_->getPosition())); // Notify UI of player position
+          player_->getPosition()));
       return events;
     }
   }
 
-  // If no game loaded, create a new one
-  map_ = std::make_unique<Model::Map>(20, 10); // Example size
+  map_ = std::make_unique<Model::Map>(20, 10);
   map_->generate();
 
-  // Create player at a valid starting position
   player_ = std::make_unique<Model::Player>("player1", Model::Stats{},
                                             Model::Position{1, 1});
   spdlog::info("New game initialized. Player: {} at ({}, {})",
                player_->getName(), player_->getPosition().x,
                player_->getPosition().y);
 
-  // Create an initial event to inform the UI about the player's starting
-  // position.
+
   events.push_back(std::make_unique<Domain::Event::PlayerMovedEvent>(
       player_->getPosition()));
   return events;
@@ -103,7 +99,7 @@ void GameEngine::handlePlayerAction(
     if (!current_enemy_) { // If not already in combat
       spdlog::debug(
           "GameEngine: Not in combat, checking for adjacent enemies.");
-      // Check for adjacent enemies
+
       Model::Position player_pos = player_->getPosition();
       std::vector<Model::Position> adjacent_positions = {
           {player_pos.x, player_pos.y - 1}, // Up
@@ -125,7 +121,7 @@ void GameEngine::handlePlayerAction(
                           current_enemy_->get().getName());
             events.push_back(
                 std::make_unique<Domain::Event::CombatStartedEvent>(
-                    current_enemy_->get().getTypeName(), // Use getTypeName()
+                    current_enemy_->get().getTypeName(),
                     current_enemy_->get().getName(),
                     current_enemy_->get().getHealth(),
                     current_enemy_->get().getStats().strength,
@@ -140,7 +136,7 @@ void GameEngine::handlePlayerAction(
 
       if (!enemy_found) {
         spdlog::warn("Player tried to attack but no adjacent enemy found.");
-        // Optionally, generate an event for "no enemy to attack"
+
         break; // Exit ATTACK case
       }
     } else {
@@ -149,7 +145,6 @@ void GameEngine::handlePlayerAction(
           current_enemy_->get().getName());
     }
 
-    // Player attacks enemy
     int player_damage = player_->getAttackPower();
     spdlog::debug("GameEngine: Player attacking {} for {} damage.",
                   current_enemy_->get().getName(), player_damage);
@@ -165,7 +160,7 @@ void GameEngine::handlePlayerAction(
     if (current_enemy_->get().getHealth() <= 0) {
       spdlog::debug("GameEngine: Enemy {} defeated.",
                     current_enemy_->get().getName());
-      // Enemy defeated
+
       int xp_gained = 50; // Example XP
       bool leveled_up = player_->gainXp(xp_gained);
       events.push_back(std::make_unique<Domain::Event::EnemyDefeatedEvent>(
@@ -179,7 +174,6 @@ void GameEngine::handlePlayerAction(
         spdlog::info("Player leveled up to level {}!", player_->getLevel());
       }
 
-      // Remove enemy from map
       map_->removeEnemyAt(current_enemy_->get().getPosition());
       current_enemy_.reset(); // Clear current enemy
     } else {
@@ -187,7 +181,7 @@ void GameEngine::handlePlayerAction(
                     "attacking player.",
                     current_enemy_->get().getName(),
                     current_enemy_->get().getHealth());
-      // Enemy attacks player
+
       int enemy_damage = current_enemy_->get().getAttackPower();
       player_->takeDamage(enemy_damage);
       events.push_back(std::make_unique<Domain::Event::EnemyAttackedEvent>(
@@ -198,19 +192,17 @@ void GameEngine::handlePlayerAction(
 
       if (player_->getHp() <= 0) {
         spdlog::debug("GameEngine: Player defeated.");
-        // Player defeated
-        events.push_back(
-            std::make_unique<Domain::Event::PlayerDiedEvent>()); // Assuming
-                                                                 // PlayerDiedEvent
-                                                                 // exists
+
+        events.push_back(std::make_unique<Domain::Event::PlayerDiedEvent>());
+
         spdlog::info("Player defeated!");
-        // TODO: Handle game over (e.g., reset player position, health)
+
       }
     }
     break;
   }
   case TuiRogGame::Port::In::PlayerActionCommand::INTERACT:
-    // TODO: Implement interact logic using command.payload
+
     spdlog::info("Player interacted.");
     break;
   case TuiRogGame::Port::In::PlayerActionCommand::USE_ITEM: {
@@ -225,7 +217,7 @@ void GameEngine::handlePlayerAction(
         spdlog::warn("Player tried to use item '{}' but it was not found or "
                      "could not be used.",
                      item_name);
-        // Optionally, generate an event for "item not found/cannot be used"
+
       }
     } else {
       spdlog::error("USE_ITEM command received without a string payload.");
@@ -244,7 +236,6 @@ void GameEngine::handlePlayerAction(
 
   processEvents(events);
 
-  // Auto-save after every player action
   if (save_port_) {
     Port::Out::GameStateDTO game_state_to_save(*map_, *player_);
     save_port_->saveGameState(game_state_to_save);
@@ -258,7 +249,6 @@ GameEngine::processPlayerMove(int dx, int dy) {
   Model::Position current_pos = player_->getPosition();
   Model::Position new_pos = {current_pos.x + dx, current_pos.y + dy};
 
-  // Wall collision detection
   if (!map_->isWalkable(new_pos.x, new_pos.y)) {
     spdlog::info("GameEngine: Player move blocked to ({}, {}). Wall detected.",
                  new_pos.x, new_pos.y);
@@ -272,12 +262,10 @@ GameEngine::processPlayerMove(int dx, int dy) {
   spdlog::info("GameEngine: Player moved to new position ({}, {}).", new_pos.x,
                new_pos.y);
 
-  // Create and return PlayerMovedEvent
   std::vector<std::unique_ptr<Domain::Event::DomainEvent>> events;
   events.push_back(std::make_unique<Domain::Event::PlayerMovedEvent>(new_pos));
   spdlog::info("GameEngine: PlayerMovedEvent created.");
 
-  // Generate description for the new position
   Port::Out::IGenerateDescriptionPort *active_description_port = nullptr;
   if (use_alternative_description_port_ && alternative_description_port_) {
     active_description_port = alternative_description_port_.get();
@@ -294,14 +282,13 @@ GameEngine::processPlayerMove(int dx, int dy) {
     spdlog::info("GameEngine: DescriptionGeneratedEvent created.");
   }
 
-  // Check for enemy encounter
   if (auto enemy_opt = map_->getEnemyAt(new_pos)) {
     current_enemy_ = std::ref(enemy_opt->get()); // Store the enemy for combat
     spdlog::debug("GameEngine: Enemy encountered at ({}, {}): {}. Setting "
                   "current_enemy_.",
                   new_pos.x, new_pos.y, current_enemy_->get().getName());
     events.push_back(std::make_unique<Domain::Event::CombatStartedEvent>(
-        current_enemy_->get().getTypeName(), // Use getTypeName()
+        current_enemy_->get().getTypeName(),
         current_enemy_->get().getName(), current_enemy_->get().getHealth(),
         current_enemy_->get().getStats().strength,
         current_enemy_->get().getStats().vitality));
@@ -309,27 +296,23 @@ GameEngine::processPlayerMove(int dx, int dy) {
         "GameEngine: CombatStartedEvent created with enemy {} at ({}, {}).",
         current_enemy_->get().getName(), new_pos.x, new_pos.y);
   } else if (auto item_opt = map_->getItemAt(new_pos)) {
-    // Check for item found (only if no enemy)
+
     auto item_unique_ptr = map_->takeItemAt(new_pos);
     if (item_unique_ptr) {
       events.push_back(std::make_unique<Domain::Event::ItemFoundEvent>(
           static_cast<Domain::Event::ItemFoundEvent::ItemType>(
-              item_unique_ptr->getType()),
-          item_unique_ptr->getName(),
-          "" // Item description is not directly available in Item.h, assuming
-             // it's part of type or will be added
-          ));
+              item_unique_ptr->getType()), item_unique_ptr->getName(), ""));
       player_->addItem(
           std::move(item_unique_ptr)); // Add item to player inventory
       spdlog::info("GameEngine: ItemFoundEvent created with item at ({}, {}).",
                    new_pos.x, new_pos.y);
     }
   } else if (map_->getTile(new_pos.x, new_pos.y) == Model::Tile::EXIT) {
-    // Player reached the exit, generate a new map
+
     map_->generate();
-    // Reset player position to a new valid starting point on the new map
-    player_->moveTo(map_->getStartPlayerPosition()); // Assuming Map has a
-                                                     // getStartPlayerPosition()
+
+    player_->moveTo(map_->getStartPlayerPosition());
+
     events.push_back(std::make_unique<Domain::Event::MapChangedEvent>());
     events.push_back(std::make_unique<Domain::Event::PlayerMovedEvent>(
         player_->getPosition()));
@@ -344,9 +327,8 @@ void GameEngine::processEvents(
   spdlog::info("GameEngine: Entering processEvents. Event count: {}",
                events.size());
 
-  // Always render the current state, even if there are no new events.
   if (render_port_) {
-    // Create the DTO with the current state
+
     Port::Out::GameStateDTO game_state_dto{*map_, *player_};
     render_port_->render(game_state_dto, events);
   }
@@ -356,7 +338,7 @@ void GameEngine::processEvents(
   } else {
     for (const auto &event : events) {
       spdlog::info("GameEngine: Processing event: {}", event->toString());
-      // Here you could have logic that reacts to events, e.g., saving the game.
+
     }
   }
 

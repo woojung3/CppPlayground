@@ -1,14 +1,12 @@
 #pragma once
-
-#include <memory>            // For std::unique_ptr
-#include <nlohmann/json.hpp> // For JSON serialization
+#include <memory>
+#include <nlohmann/json.hpp>
 #include <string>
-
-#include "Enemy.h"    // Domain Model Enemy
-#include "Goblin.h"   // For Goblin derived class
-#include "Orc.h"      // For Orc derived class
-#include "Position.h" // For Enemy's Position
-#include "Stats.h"    // For Enemy's Stats
+#include "Enemy.h"
+#include "Goblin.h"
+#include "Orc.h"
+#include "Position.h"
+#include "Stats.h"
 
 namespace TuiRogGame {
 namespace Adapter {
@@ -24,10 +22,9 @@ public:
   void deleteById(const std::string &key);
 
 private:
-  // Helper to convert string to lowercase
+
   std::string toLower(std::string s) const;
 
-  // Serialization/Deserialization helpers
   nlohmann::json serializeEnemy(const Domain::Model::Enemy &enemy) const;
   std::unique_ptr<Domain::Model::Enemy>
   deserializeEnemy(const nlohmann::json &j) const;

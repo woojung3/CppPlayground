@@ -1,12 +1,11 @@
 #include "ItemFoundEvent.h"
-#include "Item.h"      // For static_assert against original enum
-#include <type_traits> // For std::underlying_type_t
+#include "Item.h"
+#include <type_traits>
 
 namespace TuiRogGame {
 namespace Domain {
 namespace Event {
 
-// Static asserts to ensure consistency with Domain::Model::Item::ItemType
 static_assert(
     std::is_same_v<
         std::underlying_type_t<ItemFoundEvent::ItemType>,
@@ -23,8 +22,8 @@ static_assert(
         static_cast<int>(
             TuiRogGame::Domain::Model::Item::ItemType::StrengthScroll),
     "ItemFoundEvent::ItemType::StrengthScroll value mismatch");
-// Add more static_asserts here if more ItemType enumerators are added in the
-// future.
+
+
 
 ItemFoundEvent::ItemFoundEvent(ItemType item_type, const std::string &item_name,
                                const std::string &item_description)

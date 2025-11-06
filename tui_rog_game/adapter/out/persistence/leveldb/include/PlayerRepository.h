@@ -1,16 +1,15 @@
 #pragma once
 
-#include <memory>            // For std::shared_ptr
-#include <nlohmann/json.hpp> // For JSON serialization
+#include <memory>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
-
-#include "ItemRepository.h"               // For Player's inventory items
-#include "Player.h"                       // Domain Model Player
-#include "PlayerCoreStats.h"              // For Player's core stats
-#include "Position.h"                     // For Player's Position
-#include "StandardLayoutCrudRepository.h" // For standard layout parts
-#include "Stats.h"                        // For Player's Stats
+#include "ItemRepository.h"
+#include "Player.h"
+#include "PlayerCoreStats.h"
+#include "Position.h"
+#include "StandardLayoutCrudRepository.h"
+#include "Stats.h"
 
 namespace TuiRogGame {
 namespace Adapter {
@@ -27,18 +26,16 @@ public:
   void deleteById(const std::string &key);
 
 private:
-  ItemRepository &item_repo_; // Dependency on ItemRepository
+  ItemRepository &item_repo_;
 
   StandardLayoutCrudRepository<Domain::Model::PlayerCoreStats>
       player_core_stats_crud_;
   StandardLayoutCrudRepository<Domain::Model::Stats> player_stats_crud_;
   StandardLayoutCrudRepository<Domain::Model::Position> player_position_crud_;
 
-  // Helper to convert string to lowercase
   std::string toLower(std::string s) const;
 
-  // Serialization/Deserialization helpers for Player's non-standard layout
-  // parts
+
   nlohmann::json
   serializePlayerNonStandard(const Domain::Model::Player &player) const;
   std::optional<std::string> deserializePlayerId(const nlohmann::json &j) const;

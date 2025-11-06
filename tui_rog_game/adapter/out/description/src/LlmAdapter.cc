@@ -9,7 +9,6 @@ namespace Adapter {
 namespace Out {
 namespace Description {
 
-// Pimpl Idiom: Implementation struct
 struct LlmAdapter::Impl {
   std::unique_ptr<httplib::Client> cli_;
 };
@@ -17,15 +16,15 @@ struct LlmAdapter::Impl {
 LlmAdapter::LlmAdapter()
     : impl_(std::make_unique<Impl>()) {
   impl_->cli_ = std::make_unique<httplib::Client>("https://api.groq.com");
-  // 연결 재사용 설정
+
   impl_->cli_->set_keep_alive(true);
-  // 타임아웃 설정 (Groq는 매우 빠르므로 짧게 설정)
+
   impl_->cli_->set_connection_timeout(3, 0);
   impl_->cli_->set_read_timeout(5, 0);
   impl_->cli_->set_write_timeout(3, 0);
 }
 
-LlmAdapter::~LlmAdapter() = default; // Destructor definition
+LlmAdapter::~LlmAdapter() = default;
 
 std::string
 LlmAdapter::generateDescription(const Port::Out::GameStateDTO &game_state) {
@@ -52,7 +51,6 @@ LlmAdapter::generateDescription(const Port::Out::GameStateDTO &game_state) {
       "상황을 한국어로 간결하고 생생하게 묘사해주세요. 묘사는 50단어 이내로 "
       "해주세요.\n\n";
 
-  // 플레이어 정보 추가
   prompt += "플레이어 정보: 레벨 " + std::to_string(player.getLevel()) +
             ", 경험치 " + std::to_string(player.getXp()) + ", 체력 " +
             std::to_string(player.getHp()) + "/" +
@@ -71,12 +69,10 @@ LlmAdapter::generateDescription(const Port::Out::GameStateDTO &game_state) {
     prompt += ".\n";
   }
 
-  // 주변 환경 정보 추가
   std::vector<std::string> nearby_elements;
   int px = player_position.x;
   int py = player_position.y;
 
-  // 주변 1칸 이내 탐색
   for (int dy = -1; dy <= 1; ++dy) {
     for (int dx = -1; dx <= 1; ++dx) {
       if (dx == 0 && dy == 0)

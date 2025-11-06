@@ -9,15 +9,15 @@ namespace Persistence {
 
 void InMemoryAdapter::saveGameState(
     const TuiRogGame::Port::Out::GameStateDTO &gameState) {
-  stored_game_state_.emplace(gameState); // GameStateDTO를 값 복사하여 저장
+  stored_game_state_.emplace(gameState);
   spdlog::info("[InMemoryAdapter] Game saved.");
 }
 
 std::unique_ptr<TuiRogGame::Port::Out::GameStateDTO>
 InMemoryAdapter::loadGameState() {
   if (stored_game_state_) {
-    // Create a new GameStateDTO object from the stored optional and return its
-    // unique_ptr
+
+
     spdlog::info("[InMemoryAdapter] Game loaded.");
     return std::make_unique<TuiRogGame::Port::Out::GameStateDTO>(
         *stored_game_state_);

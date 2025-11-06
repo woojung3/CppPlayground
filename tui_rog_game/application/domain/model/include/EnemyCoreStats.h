@@ -1,6 +1,6 @@
 #pragma once
 
-#include <type_traits> // For std::is_standard_layout
+#include <type_traits>
 
 namespace TuiRogGame {
 namespace Domain {

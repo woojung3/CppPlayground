@@ -1,6 +1,6 @@
 #pragma once
 
-#include <type_traits> // For std::is_standard_layout
+#include <type_traits>
 
 namespace TuiRogGame {
 namespace Domain {
@@ -22,8 +22,7 @@ struct Position {
   }
 };
 
-// Verify at compile time that this struct has a standard layout, which is
-// crucial for serialization.
+
 static_assert(std::is_standard_layout<Position>::value,
               "Position must be a standard layout type for serialization.");
 

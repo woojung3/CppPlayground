@@ -1,6 +1,6 @@
 #include "MapChangedEvent.h"
-#include <string> // Use string for concatenation
-// #include <format> // Removed
+#include <string>
+
 
 namespace TuiRogGame {
 namespace Domain {

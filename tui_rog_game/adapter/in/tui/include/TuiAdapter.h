@@ -5,8 +5,8 @@
 #include "IGetPlayerActionUseCase.h"
 #include "IRenderPort.h"
 #include <ftxui/component/screen_interactive.hpp>
-#include <memory>   // For std::shared_ptr
-#include <optional> // For std::optional
+#include <memory>
+#include <optional>
 
 namespace TuiRogGame {
 namespace Adapter {
@@ -29,8 +29,7 @@ private:
   ftxui::ScreenInteractive &screen_;
   std::shared_ptr<std::optional<Port::Out::GameStateDTO>> game_state_ptr_;
   std::vector<std::string> message_log_;
-  bool show_start_screen_ =
-      true; // New member to control start screen visibility
+  bool show_start_screen_ = true;
 };
 
 } // namespace Tui
