@@ -1,51 +1,57 @@
 #ifndef TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_MAPREPOSITORY_H
 #define TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_MAPREPOSITORY_H
 
-#include <string>
-#include <optional>
-#include <memory> // For std::shared_ptr
+#include <memory>            // For std::shared_ptr
 #include <nlohmann/json.hpp> // For JSON serialization
+#include <optional>
+#include <string>
 
-#include "Map.h" // Domain Model Map
-#include "MapDimensions.h" // For Map's dimensions
-#include "Position.h" // For Map's start player position
+#include "EnemyRepository.h"              // For Map's enemies
+#include "ItemRepository.h"               // For Map's items
+#include "Map.h"                          // Domain Model Map
+#include "MapDimensions.h"                // For Map's dimensions
+#include "Position.h"                     // For Map's start player position
 #include "StandardLayoutCrudRepository.h" // For standard layout parts
-#include "EnemyRepository.h" // For Map's enemies
-#include "ItemRepository.h" // For Map's items
 
 namespace TuiRogGame {
-    namespace Adapter {
-        namespace Out {
-            namespace Persistence {
+namespace Adapter {
+namespace Out {
+namespace Persistence {
 
-                class MapRepository {
-                public:
-                    explicit MapRepository(EnemyRepository& enemy_repo, ItemRepository& item_repo);
+class MapRepository {
+public:
+  explicit MapRepository(EnemyRepository &enemy_repo,
+                         ItemRepository &item_repo);
 
-                    void saveForBatch(const std::string& key, const Domain::Model::Map& map);
-                    std::optional<Domain::Model::Map> findById(const std::string& key);
-                    void deleteById(const std::string& key);
+  void saveForBatch(const std::string &key, const Domain::Model::Map &map);
+  std::optional<Domain::Model::Map> findById(const std::string &key);
+  void deleteById(const std::string &key);
 
-                private:
-                    EnemyRepository& enemy_repo_; // Dependency on EnemyRepository
-                    ItemRepository& item_repo_; // Dependency on ItemRepository
+private:
+  EnemyRepository &enemy_repo_; // Dependency on EnemyRepository
+  ItemRepository &item_repo_;   // Dependency on ItemRepository
 
-                    StandardLayoutCrudRepository<Domain::Model::MapDimensions> map_dimensions_crud_;
-                    StandardLayoutCrudRepository<Domain::Model::Position> map_start_position_crud_;
+  StandardLayoutCrudRepository<Domain::Model::MapDimensions>
+      map_dimensions_crud_;
+  StandardLayoutCrudRepository<Domain::Model::Position>
+      map_start_position_crud_;
 
-                    // Helper to convert string to lowercase
-                    std::string toLower(std::string s) const;
+  // Helper to convert string to lowercase
+  std::string toLower(std::string s) const;
 
-                    // Serialization/Deserialization helpers for Map's non-standard layout parts
-                    nlohmann::json serializeMapNonStandard(const Domain::Model::Map& map) const;
-                    std::optional<std::vector<std::vector<Domain::Model::Tile>>> deserializeMapTiles(const nlohmann::json& j) const;
-                    std::vector<std::pair<Domain::Model::Position, std::string>> deserializeMapEnemyIds(const nlohmann::json& j) const; // Position, Enemy ID
-                    std::vector<std::pair<Domain::Model::Position, std::string>> deserializeMapItemIds(const nlohmann::json& j) const; // Position, Item ID
-                };
+  // Serialization/Deserialization helpers for Map's non-standard layout parts
+  nlohmann::json serializeMapNonStandard(const Domain::Model::Map &map) const;
+  std::optional<std::vector<std::vector<Domain::Model::Tile>>>
+  deserializeMapTiles(const nlohmann::json &j) const;
+  std::vector<std::pair<Domain::Model::Position, std::string>>
+  deserializeMapEnemyIds(const nlohmann::json &j) const; // Position, Enemy ID
+  std::vector<std::pair<Domain::Model::Position, std::string>>
+  deserializeMapItemIds(const nlohmann::json &j) const; // Position, Item ID
+};
 
-            } // namespace Persistence
-        } // namespace Out
-    } // namespace Adapter
+} // namespace Persistence
+} // namespace Out
+} // namespace Adapter
 } // namespace TuiRogGame
 
 #endif // TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_MAPREPOSITORY_H

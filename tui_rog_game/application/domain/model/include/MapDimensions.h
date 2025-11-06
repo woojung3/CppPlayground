@@ -7,11 +7,13 @@ namespace Domain {
 namespace Model {
 
 struct MapDimensions {
-    int width = 0;
-    int height = 0;
+  int width = 0;
+  int height = 0;
 };
 
-static_assert(std::is_standard_layout<MapDimensions>::value, "MapDimensions must be a standard layout type for serialization.");
+static_assert(
+    std::is_standard_layout<MapDimensions>::value,
+    "MapDimensions must be a standard layout type for serialization.");
 
 } // namespace Model
 } // namespace Domain

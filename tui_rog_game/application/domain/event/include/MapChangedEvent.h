@@ -9,10 +9,9 @@ namespace Event {
 
 class MapChangedEvent : public DomainEvent {
 public:
-    MapChangedEvent();
+  MapChangedEvent();
 
-
-    std::string toString() const override;
+  std::string toString() const override;
 
 private:
 };

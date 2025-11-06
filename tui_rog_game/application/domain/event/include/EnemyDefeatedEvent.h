@@ -9,17 +9,16 @@ namespace Event {
 
 class EnemyDefeatedEvent : public DomainEvent {
 public:
-    EnemyDefeatedEvent(const std::string& enemy_name, int xp_gained);
+  EnemyDefeatedEvent(const std::string &enemy_name, int xp_gained);
 
+  std::string toString() const override;
 
-    std::string toString() const override;
-
-    const std::string& getEnemyName() const { return enemy_name_; }
-    int getXpGained() const { return xp_gained_; }
+  const std::string &getEnemyName() const { return enemy_name_; }
+  int getXpGained() const { return xp_gained_; }
 
 private:
-    std::string enemy_name_;
-    int xp_gained_;
+  std::string enemy_name_;
+  int xp_gained_;
 };
 
 } // namespace Event

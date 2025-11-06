@@ -6,11 +6,11 @@ namespace TuiRogGame {
 namespace Domain {
 namespace Event {
 
-ItemUsedEvent::ItemUsedEvent(const std::string& item_name)
+ItemUsedEvent::ItemUsedEvent(const std::string &item_name)
     : DomainEvent(Type::ItemUsed), item_name_(item_name) {}
 
 std::string ItemUsedEvent::toString() const {
-    return "You used a " + item_name_ + ".";
+  return "You used a " + item_name_ + ".";
 }
 
 } // namespace Event

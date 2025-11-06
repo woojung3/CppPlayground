@@ -9,15 +9,14 @@ namespace Event {
 
 class ItemUsedEvent : public DomainEvent {
 public:
-    ItemUsedEvent(const std::string& item_name);
+  ItemUsedEvent(const std::string &item_name);
 
+  std::string toString() const override;
 
-    std::string toString() const override;
-
-    const std::string& getItemName() const { return item_name_; }
+  const std::string &getItemName() const { return item_name_; }
 
 private:
-    std::string item_name_;
+  std::string item_name_;
 };
 
 } // namespace Event

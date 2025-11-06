@@ -9,13 +9,13 @@ namespace Model {
 
 class Goblin : public Enemy {
 public:
-    Goblin(Position position);
-    Goblin(const Goblin& other) : Enemy(other) {}
+  Goblin(Position position);
+  Goblin(const Goblin &other) : Enemy(other) {}
 
-    std::string getTypeName() const override;
-    std::unique_ptr<Enemy> clone() const override {
-        return std::make_unique<Goblin>(*this);
-    }
+  std::string getTypeName() const override;
+  std::unique_ptr<Enemy> clone() const override {
+    return std::make_unique<Goblin>(*this);
+  }
 };
 
 } // namespace Model

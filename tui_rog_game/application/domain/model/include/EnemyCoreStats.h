@@ -7,10 +7,12 @@ namespace Domain {
 namespace Model {
 
 struct EnemyCoreStats {
-    int health = 0;
+  int health = 0;
 };
 
-static_assert(std::is_standard_layout<EnemyCoreStats>::value, "EnemyCoreStats must be a standard layout type for serialization.");
+static_assert(
+    std::is_standard_layout<EnemyCoreStats>::value,
+    "EnemyCoreStats must be a standard layout type for serialization.");
 
 } // namespace Model
 } // namespace Domain

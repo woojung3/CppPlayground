@@ -9,7 +9,8 @@ namespace Assembly {
 
 class ApplicationBuilder {
 public:
-    static std::unique_ptr<Adapter::In::Tui::TuiAdapter> build(ftxui::ScreenInteractive& screen);
+  static std::unique_ptr<Adapter::In::Tui::TuiAdapter>
+  build(ftxui::ScreenInteractive &screen);
 };
 
 } // namespace Assembly

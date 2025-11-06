@@ -1,37 +1,40 @@
 #ifndef TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_INMEMORYADAPTER_H
 #define TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_INMEMORYADAPTER_H
 
-#include "ISaveGameStatePort.h"
 #include "ILoadGameStatePort.h"
-#include <optional>
+#include "ISaveGameStatePort.h"
 #include <memory>
+#include <optional>
 
 namespace TuiRogGame {
-    namespace Adapter {
-        namespace Out {
-            namespace Persistence {
+namespace Adapter {
+namespace Out {
+namespace Persistence {
 
-                class InMemoryAdapter : public Port::Out::ISaveGameStatePort, public Port::Out::ILoadGameStatePort {
-                public:
-                    InMemoryAdapter() = default;
-                    ~InMemoryAdapter() override = default;
+class InMemoryAdapter : public Port::Out::ISaveGameStatePort,
+                        public Port::Out::ILoadGameStatePort {
+public:
+  InMemoryAdapter() = default;
+  ~InMemoryAdapter() override = default;
 
-                    // Saves the full game state to an in-memory store.
-                    void saveGameState(const TuiRogGame::Port::Out::GameStateDTO& gameState) override;
+  // Saves the full game state to an in-memory store.
+  void
+  saveGameState(const TuiRogGame::Port::Out::GameStateDTO &gameState) override;
 
-                    // Loads the full game state from the in-memory store.
-                    // Returns a unique_ptr to a new GameStateDTO object, or nullptr if no game was saved.
-                    std::unique_ptr<TuiRogGame::Port::Out::GameStateDTO> loadGameState() override;
+  // Loads the full game state from the in-memory store.
+  // Returns a unique_ptr to a new GameStateDTO object, or nullptr if no game
+  // was saved.
+  std::unique_ptr<TuiRogGame::Port::Out::GameStateDTO> loadGameState() override;
 
-                private:
-                    // Stores the last saved game state. Using std::optional to represent
-                    // whether a game has been saved or not.
-                    std::optional<TuiRogGame::Port::Out::GameStateDTO> stored_game_state_;
-                };
+private:
+  // Stores the last saved game state. Using std::optional to represent
+  // whether a game has been saved or not.
+  std::optional<TuiRogGame::Port::Out::GameStateDTO> stored_game_state_;
+};
 
-            } // namespace Persistence
-        } // namespace Out
-    } // namespace Adapter
+} // namespace Persistence
+} // namespace Out
+} // namespace Adapter
 } // namespace TuiRogGame
 
 #endif // TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_INMEMORYADAPTER_H
