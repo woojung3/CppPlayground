@@ -1,11 +1,11 @@
 #include <iostream>
 #include <memory>
 #include <spdlog/spdlog.h>
-#include <spdlog/sinks/basic_file_sink.h> // New include
+#include <spdlog/sinks/basic_file_sink.h>
 
 #include "LevelDbAdapter.h"
 #include "HardcodedDescAdapter.h"
-#include "ChatGptAdapter.h" // New include
+#include "LlmAdapter.h"
 #include "GameEngine.h"
 #include "TuiAdapter.h"
 
@@ -24,10 +24,10 @@ int main() {
     // 1. Create concrete implementations of outbound adapters (excluding renderer)
     auto persistence_adapter = std::make_unique<TuiRogGame::Adapter::Out::Persistence::LevelDbAdapter>("./game_data.db");
     auto hardcoded_desc_adapter = std::make_unique<TuiRogGame::Adapter::Out::Description::HardcodedDescAdapter>();
-    auto chatgpt_desc_adapter = std::make_unique<TuiRogGame::Adapter::Out::Description::ChatGptAdapter>(); // New adapter
+    auto chatgpt_desc_adapter = std::make_unique<TuiRogGame::Adapter::Out::Description::LlmAdapter>(); // New adapter
 
     // 2. Create the GameEngine. It doesn't know about the renderer yet.
-    // Pass both description adapters. The primary will be Hardcoded, alternative will be ChatGPT.
+    // Pass both description adapters. The primary will be Hardcoded, alternative will be AI.
     auto game_engine = std::make_unique<TuiRogGame::Domain::Service::GameEngine>(
         std::move(persistence_adapter),
         std::move(hardcoded_desc_adapter),

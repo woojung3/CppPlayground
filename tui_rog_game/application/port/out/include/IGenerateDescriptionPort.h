@@ -11,7 +11,7 @@ namespace TuiRogGame {
 
             // IGenerateDescriptionPort is an outbound port interface that defines operations
             // for generating textual descriptions based on game state.
-            // Adapters like ChatGptAdapter or HardcodedDescAdapter will implement this.
+            // Adapters like LlmAdapter or HardcodedDescAdapter will implement this.
             class IGenerateDescriptionPort {
             public:
                 virtual ~IGenerateDescriptionPort() = default;

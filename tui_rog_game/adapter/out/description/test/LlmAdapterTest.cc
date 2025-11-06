@@ -1,14 +1,14 @@
 #include "gtest/gtest.h"
-#include "ChatGptAdapter.h" // This is now our GeminiAdapter
+#include "LlmAdapter.h" // This is now our GeminiAdapter
 #include "Position.h"
 #include <string>
 #include <cstdlib> // For std::getenv
 #include <spdlog/spdlog.h>
 
-// Define a test fixture for ChatGptAdapter
-class ChatGptAdapterTest : public ::testing::Test {
+// Define a test fixture for LlmAdapter
+class LlmAdapterTest : public ::testing::Test {
 protected:
-    TuiRogGame::Adapter::Out::Description::ChatGptAdapter adapter;
+    TuiRogGame::Adapter::Out::Description::LlmAdapter adapter;
     TuiRogGame::Domain::Model::Position test_position = {5, 10};
 
     void SetUp() override {
@@ -22,8 +22,8 @@ protected:
 };
 
 // Test case for generateDescription
-TEST_F(ChatGptAdapterTest, GeneratesNonEmptyDescription) {
-    spdlog::info("Running ChatGptAdapterTest.GeneratesNonEmptyDescription");
+TEST_F(LlmAdapterTest, GeneratesNonEmptyDescription) {
+    spdlog::info("Running LlmAdapterTest.GeneratesNonEmptyDescription");
     std::string description = adapter.generateDescription(test_position);
     spdlog::info("Generated Description: {}", description);
 

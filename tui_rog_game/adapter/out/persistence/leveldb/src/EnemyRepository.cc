@@ -1,4 +1,5 @@
 #include "EnemyRepository.h"
+#include "LevelDbProvider.h"
 #include <spdlog/spdlog.h>
 #include <algorithm> // For std::transform
 #include <cctype> // For std::tolower
@@ -8,12 +9,7 @@ namespace TuiRogGame {
         namespace Out {
             namespace Persistence {
 
-                EnemyRepository::EnemyRepository(std::shared_ptr<leveldb::DB> db)
-                    : db_(db) {
-                    if (!db_) {
-                        spdlog::error("EnemyRepository: Initialized with null LevelDB pointer.");
-                    }
-                }
+                EnemyRepository::EnemyRepository() = default;
 
                 std::string EnemyRepository::toLower(std::string s) const {
                     std::transform(s.begin(), s.end(), s.begin(),
@@ -67,54 +63,37 @@ namespace TuiRogGame {
                     }
                 }
 
-                void EnemyRepository::save(const std::string& key, const Domain::Model::Enemy& enemy, leveldb::WriteBatch& batch) {
+                void EnemyRepository::saveForBatch(const std::string& key, const Domain::Model::Enemy& enemy) {
                     std::string lower_key = toLower(key);
                     nlohmann::json j = serializeEnemy(enemy);
-                    batch.Put(lower_key, j.dump());
-                    spdlog::debug("EnemyRepository: Added Put for key '{}' to WriteBatch.", lower_key);
+                    LevelDbProvider::getInstance().addToBatch(lower_key, j.dump());
+                    spdlog::debug("EnemyRepository: Added Put for key '{}' to batch.", lower_key);
                 }
 
                 std::optional<Domain::Model::Enemy> EnemyRepository::findById(const std::string& key) {
-                    if (!db_) {
-                        spdlog::error("EnemyRepository: Cannot find, LevelDB is not open.");
-                        return std::nullopt;
-                    }
+                    auto& provider = LevelDbProvider::getInstance();
 
                     std::string lower_key = toLower(key);
-                    std::string value_str;
-                    leveldb::Status status = db_->Get(leveldb::ReadOptions(), lower_key, &value_str);
+                    auto value_str_opt = provider.Get(lower_key);
 
-                    if (status.IsNotFound()) {
-                        spdlog::debug("EnemyRepository: Key '{}' not found.", lower_key);
-                        return std::nullopt;
-                    } else if (!status.ok()) {
-                        spdlog::error("EnemyRepository: Failed to find key '{}': {}", lower_key, status.ToString());
-                        return std::nullopt;
+                    if (!value_str_opt) {
+                        return std::nullopt; // Not found or error already logged by provider
                     }
-                    else {
-                        try {
-                            nlohmann::json j = nlohmann::json::parse(value_str);
-                            return deserializeEnemy(j);
-                        } catch (const nlohmann::json::exception& e) {
-                            spdlog::error("EnemyRepository: Failed to parse JSON for key '{}': {}", lower_key, e.what());
-                            return std::nullopt;
-                        }
+                    
+                    try {
+                        nlohmann::json j = nlohmann::json::parse(*value_str_opt);
+                        return deserializeEnemy(j);
+                    } catch (const nlohmann::json::exception& e) {
+                        spdlog::error("EnemyRepository: Failed to parse JSON for key '{}': {}", lower_key, e.what());
+                        return std::nullopt;
                     }
                 }
 
                 void EnemyRepository::deleteById(const std::string& key) {
-                    if (!db_) {
-                        spdlog::error("EnemyRepository: Cannot delete, LevelDB is not open.");
-                        return;
-                    }
-
+                    auto& provider = LevelDbProvider::getInstance();
                     std::string lower_key = toLower(key);
-                    leveldb::Status status = db_->Delete(leveldb::WriteOptions(), lower_key);
-
-                    if (!status.ok()) {
-                        spdlog::error("EnemyRepository: Failed to delete key '{}': {}", lower_key, status.ToString());
-                    } else {
-                        spdlog::debug("EnemyRepository: Deleted key '{}'.", lower_key);
+                    if (provider.Delete(lower_key)) {
+                         spdlog::debug("EnemyRepository: Deleted key '{}'.", lower_key);
                     }
                 }
 

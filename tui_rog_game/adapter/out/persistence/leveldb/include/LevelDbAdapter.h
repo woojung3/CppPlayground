@@ -2,18 +2,9 @@
 #define TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_LEVELDBADAPTER_H
 
 #include "IPersistencePort.h"
+#include "GameStateDTO.h"
 #include <string>
-#include <optional>
-#include <memory> // For std::unique_ptr and std::shared_ptr
-
-#include <leveldb/db.h> // LevelDB header
-#include <leveldb/write_batch.h> // For leveldb::WriteBatch
-
-// Include full headers for repository types
-#include "ItemRepository.h"
-#include "EnemyRepository.h"
-#include "PlayerRepository.h"
-#include "MapRepository.h"
+#include <memory> // For std::unique_ptr
 
 namespace TuiRogGame {
     namespace Adapter {
@@ -29,13 +20,8 @@ namespace TuiRogGame {
                     std::unique_ptr<Port::Out::GameStateDTO> loadGame() override;
 
                 private:
-                    std::shared_ptr<leveldb::DB> db_; // Shared DB pointer
-                    
-                    // Repository instances as direct members
-                    ItemRepository item_repo_;
-                    EnemyRepository enemy_repo_;
-                    PlayerRepository player_repo_;
-                    MapRepository map_repo_;
+                    struct Impl; // Forward-declaration of the implementation struct
+                    std::unique_ptr<Impl> impl_; // Pointer to implementation
                 };
 
             } // namespace Persistence

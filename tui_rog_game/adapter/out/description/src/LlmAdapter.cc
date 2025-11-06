@@ -1,4 +1,4 @@
-#include "ChatGptAdapter.h"
+#include "LlmAdapter.h"
 #include "IGenerateDescriptionPort.h"
 #include <httplib.h>
 #include <nlohmann/json.hpp>
@@ -9,17 +9,17 @@ namespace TuiRogGame {
         namespace Out {
             namespace Description {
 
-                ChatGptAdapter::ChatGptAdapter() 
+                LlmAdapter::LlmAdapter() 
                     : cli_(std::make_unique<httplib::Client>("https://generativelanguage.googleapis.com")) {
                     // Constructor implementation
                 }
 
-                std::string ChatGptAdapter::generateDescription(const TuiRogGame::Domain::Model::Position& player_position) {
-                    spdlog::info("Gemini Adapter: Generating description for position ({}, {})", player_position.x, player_position.y);
+                std::string LlmAdapter::generateDescription(const TuiRogGame::Domain::Model::Position& player_position) {
+                    spdlog::info("AI Adapter: Generating description for position ({}, {})", player_position.x, player_position.y);
 
                     const char* gemini_api_key = std::getenv("GEMINI_API_KEY");
                     if (!gemini_api_key) {
-                        spdlog::error("Gemini Adapter: GEMINI_API_KEY environment variable not set.");
+                        spdlog::error("AI Adapter: GEMINI_API_KEY environment variable not set.");
                         return "An ancient, echoing chamber, but the magic seems to have failed. (API Key Missing)";
                     }
 
@@ -39,19 +39,19 @@ namespace TuiRogGame {
                                 if (candidate.contains("content") && candidate["content"].contains("parts") && !candidate["content"]["parts"].empty()) {
                                     const auto& part = candidate["content"]["parts"][0];
                                     if (part.contains("text")) {
-                                        spdlog::info("Gemini Adapter: Successfully generated description.");
+                                        spdlog::info("AI Adapter: Successfully generated description.");
                                         return part["text"].get<std::string>();
                                     }
                                 }
                             }
-                            spdlog::error("Gemini Adapter: LLM response missing expected fields.");
+                            spdlog::error("AI Adapter: LLM response missing expected fields.");
                             return "An ancient, echoing chamber, but the magic seems to have failed. (Invalid LLM Response)";
                         } catch (const nlohmann::json::parse_error& e) {
-                            spdlog::error("Gemini Adapter: Failed to parse LLM response JSON: {}", e.what());
+                            spdlog::error("AI Adapter: Failed to parse LLM response JSON: {}", e.what());
                             return "An ancient, echoing chamber, but the magic seems to have failed. (JSON Parse Error)";
                         }
                     } else {
-                        spdlog::error("Gemini Adapter: Failed to get response from LLM API. Status: {}, Error: {}", res ? res->status : 0, res ? res->body : "(no response body)");
+                        spdlog::error("AI Adapter: Failed to get response from LLM API. Status: {}, Error: {}", res ? res->status : 0, res ? res->body : "(no response body)");
                         return "An ancient, echoing chamber, but the magic seems to have failed. (API Request Failed)";
                     }
                 }

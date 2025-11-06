@@ -122,7 +122,6 @@ target_link_libraries(tui_rog_game
         nlohmann_json::nlohmann_json
         spdlog::spdlog
         cxxopts::cxxopts
-        leveldb
 )
 
 # Set include directories for the entire project

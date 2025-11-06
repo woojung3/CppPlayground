@@ -1,6 +1,6 @@
 # Description Adapter는 정적(STATIC) 라이브러리로 정의합니다.
 add_library(description_adapter STATIC
-    src/ChatGptAdapter.cc
+    src/LlmAdapter.cc
     src/HardcodedDescAdapter.cc
 )
 

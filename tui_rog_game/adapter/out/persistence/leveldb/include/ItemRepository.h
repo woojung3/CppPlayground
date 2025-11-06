@@ -4,12 +4,9 @@
 #include <string>
 #include <optional>
 #include <memory> // For std::shared_ptr
-#include <leveldb/db.h> // LevelDB header
 #include <nlohmann/json.hpp> // For JSON serialization
 
 #include "Item.h" // Domain Model Item
-
-#include <leveldb/write_batch.h> // For leveldb::WriteBatch
 
 namespace TuiRogGame {
     namespace Adapter {
@@ -18,15 +15,13 @@ namespace TuiRogGame {
 
                 class ItemRepository {
                 public:
-                    explicit ItemRepository(std::shared_ptr<leveldb::DB> db);
+                    explicit ItemRepository();
 
-                    void save(const std::string& key, const Domain::Model::Item& item, leveldb::WriteBatch& batch);
+                    void saveForBatch(const std::string& key, const Domain::Model::Item& item);
                     std::optional<Domain::Model::Item> findById(const std::string& key);
                     void deleteById(const std::string& key);
 
                 private:
-                    std::shared_ptr<leveldb::DB> db_;
-
                     // Helper to convert string to lowercase
                     std::string toLower(std::string s) const;
 

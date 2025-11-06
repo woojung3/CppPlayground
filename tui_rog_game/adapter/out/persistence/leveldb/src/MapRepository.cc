@@ -1,4 +1,5 @@
 #include "MapRepository.h"
+#include "LevelDbProvider.h"
 #include <spdlog/spdlog.h>
 #include <algorithm> // For std::transform
 #include <cctype> // For std::tolower
@@ -8,15 +9,9 @@ namespace TuiRogGame {
         namespace Out {
             namespace Persistence {
 
-                MapRepository::MapRepository(std::shared_ptr<leveldb::DB> db, EnemyRepository& enemy_repo, ItemRepository& item_repo)
-                    : db_(db),
-                      enemy_repo_(enemy_repo),
-                      item_repo_(item_repo),
-                      map_dimensions_crud_(db),
-                      map_start_position_crud_(db) {
-                    if (!db_) {
-                        spdlog::error("MapRepository: Initialized with null LevelDB pointer.");
-                    }
+                MapRepository::MapRepository(EnemyRepository& enemy_repo, ItemRepository& item_repo)
+                    : enemy_repo_(enemy_repo),
+                      item_repo_(item_repo) {
                 }
 
                 std::string MapRepository::toLower(std::string s) const {
@@ -97,27 +92,27 @@ namespace TuiRogGame {
                     return item_ids;
                 }
 
-                void MapRepository::save(const std::string& key, const Domain::Model::Map& map, leveldb::WriteBatch& batch) {
+                void MapRepository::saveForBatch(const std::string& key, const Domain::Model::Map& map) {
                     std::string base_key = toLower(key);
 
                     // Save standard layout parts
                     Domain::Model::MapDimensions dimensions = {map.getWidth(), map.getHeight()};
-                    map_dimensions_crud_.save(base_key + ":dimensions", dimensions, batch);
-                    map_start_position_crud_.save(base_key + ":start_position", map.getStartPlayerPosition(), batch);
+                    map_dimensions_crud_.saveForBatch(base_key + ":dimensions", dimensions);
+                    map_start_position_crud_.saveForBatch(base_key + ":start_position", map.getStartPlayerPosition());
 
                     // Save non-standard layout parts (tiles, enemy/item IDs) as JSON
                     nlohmann::json j = serializeMapNonStandard(map);
-                    batch.Put(base_key + ":non_standard", j.dump());
-                    spdlog::debug("MapRepository: Added Put for non-standard parts for key '{}' to WriteBatch.", base_key);
+                    LevelDbProvider::getInstance().addToBatch(base_key + ":non_standard", j.dump());
+                    spdlog::debug("MapRepository: Added non-standard parts for key '{}' to batch.", base_key);
 
                     // Save enemies and items using their respective repositories
                     for (const auto& pair : map.getEnemies()) {
-                        enemy_repo_.save(base_key + ":enemies:" + pair.second->getName(), *pair.second, batch); // Using name as ID
+                        enemy_repo_.saveForBatch(base_key + ":enemies:" + pair.second->getName(), *pair.second); // Using name as ID
                     }
                     for (const auto& pair : map.getItems()) {
-                        item_repo_.save(base_key + ":items:" + pair.second->getName(), *pair.second, batch); // Using name as ID
+                        item_repo_.saveForBatch(base_key + ":items:" + pair.second->getName(), *pair.second); // Using name as ID
                     }
-                    spdlog::debug("MapRepository: Added map '{}' and its entities to WriteBatch.", base_key);
+                    spdlog::debug("MapRepository: Added map '{}' and its entities to batch.", base_key);
                 }
 
                 std::optional<Domain::Model::Map> MapRepository::findById(const std::string& key) {
@@ -133,15 +128,15 @@ namespace TuiRogGame {
                     }
 
                     // Load non-standard layout parts (tiles, enemy/item IDs) from JSON
-                    std::string non_standard_json_str;
-                    leveldb::Status status = db_->Get(leveldb::ReadOptions(), base_key + ":non_standard", &non_standard_json_str);
-                    if (!status.ok()) {
-                        spdlog::debug("MapRepository: Missing non-standard parts for key '{}': {}", base_key, status.ToString());
+                    auto& provider = LevelDbProvider::getInstance();
+                    auto non_standard_json_str_opt = provider.Get(base_key + ":non_standard");
+                    if (!non_standard_json_str_opt) {
+                        spdlog::debug("MapRepository: Missing non-standard parts for key '{}'.", base_key);
                         return std::nullopt;
                     }
 
                     try {
-                        nlohmann::json j = nlohmann::json::parse(non_standard_json_str);
+                        nlohmann::json j = nlohmann::json::parse(*non_standard_json_str_opt);
                         auto tiles_opt = deserializeMapTiles(j);
                         std::vector<std::pair<Domain::Model::Position, std::string>> enemy_ids_and_pos = deserializeMapEnemyIds(j);
                         std::vector<std::pair<Domain::Model::Position, std::string>> item_ids_and_pos = deserializeMapItemIds(j);
@@ -186,6 +181,7 @@ namespace TuiRogGame {
                 }
 
                 void MapRepository::deleteById(const std::string& key) {
+                    auto& provider = LevelDbProvider::getInstance();
                     std::string base_key = toLower(key);
 
                     // Delete standard layout parts
@@ -193,11 +189,10 @@ namespace TuiRogGame {
                     map_start_position_crud_.deleteById(base_key + ":start_position");
 
                     // Load non-standard parts to get enemy/item IDs for deletion
-                    std::string non_standard_json_str;
-                    leveldb::Status status_get = db_->Get(leveldb::ReadOptions(), base_key + ":non_standard", &non_standard_json_str);
-                    if (status_get.ok()) {
+                    auto non_standard_json_str_opt = provider.Get(base_key + ":non_standard");
+                    if (non_standard_json_str_opt) {
                         try {
-                            nlohmann::json j = nlohmann::json::parse(non_standard_json_str);
+                            nlohmann::json j = nlohmann::json::parse(*non_standard_json_str_opt);
                             std::vector<std::pair<Domain::Model::Position, std::string>> enemy_ids_and_pos = deserializeMapEnemyIds(j);
                             std::vector<std::pair<Domain::Model::Position, std::string>> item_ids_and_pos = deserializeMapItemIds(j);
 
@@ -215,10 +210,7 @@ namespace TuiRogGame {
                     }
 
                     // Delete non-standard layout parts
-                    leveldb::Status status_del = db_->Delete(leveldb::WriteOptions(), base_key + ":non_standard");
-                    if (!status_del.ok()) {
-                        spdlog::error("MapRepository: Failed to delete non-standard parts for key '{}': {}", base_key, status_del.ToString());
-                    }
+                    provider.Delete(base_key + ":non_standard");
                     spdlog::debug("MapRepository: Deleted map '{}' and its entities.", base_key);
                 }
 

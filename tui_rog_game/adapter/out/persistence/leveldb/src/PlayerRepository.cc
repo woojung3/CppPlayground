@@ -1,4 +1,5 @@
 #include "PlayerRepository.h"
+#include "LevelDbProvider.h"
 #include <spdlog/spdlog.h>
 #include <algorithm> // For std::transform
 #include <cctype> // For std::tolower
@@ -8,15 +9,8 @@ namespace TuiRogGame {
         namespace Out {
             namespace Persistence {
 
-                PlayerRepository::PlayerRepository(std::shared_ptr<leveldb::DB> db, ItemRepository& item_repo)
-                    : db_(db),
-                      item_repo_(item_repo),
-                      player_core_stats_crud_(db),
-                      player_stats_crud_(db),
-                      player_position_crud_(db) {
-                    if (!db_) {
-                        spdlog::error("PlayerRepository: Initialized with null LevelDB pointer.");
-                    }
+                PlayerRepository::PlayerRepository(ItemRepository& item_repo)
+                    : item_repo_(item_repo) {
                 }
 
                 std::string PlayerRepository::toLower(std::string s) const {
@@ -57,29 +51,29 @@ namespace TuiRogGame {
                     return item_ids;
                 }
 
-                void PlayerRepository::save(const std::string& key, const Domain::Model::Player& player, leveldb::WriteBatch& batch) {
+                void PlayerRepository::saveForBatch(const std::string& key, const Domain::Model::Player& player) {
                     // Key convention: player:id
                     std::string base_key = toLower(key); // e.g., "player:main_player"
 
                     // Save standard layout parts using CrudRepository
                     Domain::Model::PlayerCoreStats core_stats = {player.getLevel(), player.getXp(), player.getHp()};
-                    player_core_stats_crud_.save(base_key + ":core_stats", core_stats, batch);
-                    player_stats_crud_.save(base_key + ":stats", player.getStats(), batch);
-                    player_position_crud_.save(base_key + ":position", player.getPosition(), batch);
+                    player_core_stats_crud_.saveForBatch(base_key + ":core_stats", core_stats);
+                    player_stats_crud_.saveForBatch(base_key + ":stats", player.getStats());
+                    player_position_crud_.saveForBatch(base_key + ":position", player.getPosition());
 
                     // Save non-standard layout parts (id and inventory item IDs) as JSON
                     nlohmann::json j = serializePlayerNonStandard(player);
-                    batch.Put(base_key + ":non_standard", j.dump());
-                    spdlog::debug("PlayerRepository: Added Put for non-standard parts for key '{}' to WriteBatch.", base_key);
+                    LevelDbProvider::getInstance().addToBatch(base_key + ":non_standard", j.dump());
+                    spdlog::debug("PlayerRepository: Added non-standard parts for key '{}' to batch.", base_key);
 
                     // Save each item in the inventory using ItemRepository
                     int item_index = 0;
                     for (const auto& item_ptr : player.getInventory()) {
                         // Key convention: player:id:inventory:item_index
-                        item_repo_.save(base_key + ":inventory:" + std::to_string(item_index), *item_ptr, batch);
+                        item_repo_.saveForBatch(base_key + ":inventory:" + std::to_string(item_index), *item_ptr);
                         item_index++;
                     }
-                    spdlog::debug("PlayerRepository: Added player '{}' and its inventory to WriteBatch.", base_key);
+                    spdlog::debug("PlayerRepository: Added player '{}' and its inventory to batch.", base_key);
                 }
 
                 std::optional<Domain::Model::Player> PlayerRepository::findById(const std::string& key) {
@@ -96,15 +90,15 @@ namespace TuiRogGame {
                     }
 
                     // Load non-standard layout parts (id and inventory item IDs) from JSON
-                    std::string non_standard_json_str;
-                    leveldb::Status status = db_->Get(leveldb::ReadOptions(), base_key + ":non_standard", &non_standard_json_str);
-                    if (!status.ok()) {
-                        spdlog::debug("PlayerRepository: Missing non-standard parts for key '{}': {}", base_key, status.ToString());
+                    auto& provider = LevelDbProvider::getInstance();
+                    auto non_standard_json_str_opt = provider.Get(base_key + ":non_standard");
+                    if (!non_standard_json_str_opt) {
+                        spdlog::debug("PlayerRepository: Missing non-standard parts for key '{}'.", base_key);
                         return std::nullopt;
                     }
 
                     try {
-                        nlohmann::json j = nlohmann::json::parse(non_standard_json_str);
+                        nlohmann::json j = nlohmann::json::parse(*non_standard_json_str_opt);
                         auto id_opt = deserializePlayerId(j);
                         std::vector<std::string> inventory_item_ids = deserializePlayerInventoryItemIds(j);
 
@@ -115,13 +109,15 @@ namespace TuiRogGame {
 
                         // Load inventory items first
                         std::vector<std::unique_ptr<Domain::Model::Item>> loaded_inventory_items;
+                        int item_index = 0;
                         for (const std::string& item_id : inventory_item_ids) {
-                            auto item_opt = item_repo_.findById(base_key + ":inventory:" + item_id); // Use full item ID
+                            auto item_opt = item_repo_.findById(base_key + ":inventory:" + std::to_string(item_index)); // Use index-based key
                             if (item_opt) {
                                 loaded_inventory_items.push_back(std::make_unique<Domain::Model::Item>(item_opt.value()));
                             } else {
-                                spdlog::warn("PlayerRepository: Item '{}' not found for player '{}'.", item_id, base_key);
+                                spdlog::warn("PlayerRepository: Item at index '{}' not found for player '{}'.", item_index, base_key);
                             }
+                            item_index++;
                         }
 
                         // Reconstruct Player object using the new constructor
@@ -137,6 +133,7 @@ namespace TuiRogGame {
                 }
 
                 void PlayerRepository::deleteById(const std::string& key) {
+                    auto& provider = LevelDbProvider::getInstance();
                     std::string base_key = toLower(key);
 
                     // Delete standard layout parts
@@ -145,10 +142,7 @@ namespace TuiRogGame {
                     player_position_crud_.deleteById(base_key + ":position");
 
                     // Delete non-standard layout parts
-                    leveldb::Status status = db_->Delete(leveldb::WriteOptions(), base_key + ":non_standard");
-                    if (!status.ok()) {
-                        spdlog::error("PlayerRepository: Failed to delete non-standard parts for key '{}': {}", base_key, status.ToString());
-                    }
+                    provider.Delete(base_key + ":non_standard");
 
                     // Delete inventory items (this requires iterating through keys or knowing item IDs)
                     // For now, this is a placeholder. A more robust solution would involve

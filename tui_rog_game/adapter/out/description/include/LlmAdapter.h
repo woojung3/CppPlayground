@@ -11,12 +11,12 @@ namespace TuiRogGame {
         namespace Out {
             namespace Description {
 
-                // ChatGptAdapter is a concrete implementation of IGenerateDescriptionPort
+                // LlmAdapter is a concrete implementation of IGenerateDescriptionPort
                 // that interacts with the ChatGPT API to generate descriptions.
-                class ChatGptAdapter : public Port::Out::IGenerateDescriptionPort {
+                class LlmAdapter : public Port::Out::IGenerateDescriptionPort {
                 public:
-                    ChatGptAdapter();
-                    ~ChatGptAdapter() override = default;
+                    LlmAdapter();
+                    ~LlmAdapter() override = default;
 
                     std::string generateDescription(const TuiRogGame::Domain::Model::Position& player_position) override;
 
