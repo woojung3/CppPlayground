@@ -8,15 +8,24 @@ namespace TuiRogGame {
 namespace Adapter {
 namespace Out {
 namespace Description {
+
+// Pimpl Idiom: Implementation struct
+struct LlmAdapter::Impl {
+  std::unique_ptr<httplib::Client> cli_;
+};
+
 LlmAdapter::LlmAdapter()
-    : cli_(std::make_unique<httplib::Client>("https://api.groq.com")) {
+    : impl_(std::make_unique<Impl>()) {
+  impl_->cli_ = std::make_unique<httplib::Client>("https://api.groq.com");
   // 연결 재사용 설정
-  cli_->set_keep_alive(true);
+  impl_->cli_->set_keep_alive(true);
   // 타임아웃 설정 (Groq는 매우 빠르므로 짧게 설정)
-  cli_->set_connection_timeout(3, 0);
-  cli_->set_read_timeout(5, 0);
-  cli_->set_write_timeout(3, 0);
+  impl_->cli_->set_connection_timeout(3, 0);
+  impl_->cli_->set_read_timeout(5, 0);
+  impl_->cli_->set_write_timeout(3, 0);
 }
+
+LlmAdapter::~LlmAdapter() = default; // Destructor definition
 
 std::string
 LlmAdapter::generateDescription(const Port::Out::GameStateDTO &game_state) {
@@ -116,7 +125,7 @@ LlmAdapter::generateDescription(const Port::Out::GameStateDTO &game_state) {
       {"Authorization", "Bearer " + std::string(groq_api_key)},
       {"Content-Type", "application/json"}};
 
-  auto res = cli_->Post(path.c_str(), headers, request_body.dump(),
+  auto res = impl_->cli_->Post(path.c_str(), headers, request_body.dump(),
                         "application/json");
 
   if (res && res->status == 200) {
