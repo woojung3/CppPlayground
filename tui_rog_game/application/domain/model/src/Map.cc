@@ -42,22 +42,52 @@ Map::Map(const Map &other)
 }
 
 void Map::generate() {
-
   enemies_.clear();
   items_.clear();
 
+  // Initialize all tiles to WALL
   for (int y = 0; y < height_; ++y) {
     for (int x = 0; x < width_; ++x) {
       tiles_[y][x] = Tile::WALL;
     }
   }
 
-  for (int y = 1; y < height_ - 1; ++y) {
-    for (int x = 1; x < width_ - 1; ++x) {
-      tiles_[y][x] = Tile::FLOOR;
+  // Random walk parameters
+  int max_walk_length = width_ * height_ * 2; // Walk for a length proportional to map size
+  int current_x = width_ / 2;
+  int current_y = height_ / 2;
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<> distrib(0, 3); // 0: up, 1: down, 2: left, 3: right
+
+  for (int i = 0; i < max_walk_length; ++i) {
+    if (isValidPosition(current_x, current_y)) {
+      tiles_[current_y][current_x] = Tile::FLOOR;
     }
+
+    int direction = distrib(gen);
+    switch (direction) {
+    case 0: // Up
+      current_y--;
+      break;
+    case 1: // Down
+      current_y++;
+      break;
+    case 2: // Left
+      current_x--;
+      break;
+    case 3: // Right
+      current_x++;
+      break;
+    }
+
+    // Keep walker within bounds
+    current_x = std::max(1, std::min(current_x, width_ - 2));
+    current_y = std::max(1, std::min(current_y, height_ - 2));
   }
 
+  // Collect all floor positions after random walk
   std::vector<Position> floor_positions;
   for (int y = 0; y < height_; ++y) {
     for (int x = 0; x < width_; ++x) {
@@ -67,45 +97,71 @@ void Map::generate() {
     }
   }
 
-  if (floor_positions.size() < 5) {
-    spdlog::error(
-        "Map is too small for all elements. Minimum 5 floor tiles required.");
-
-    return;
+  if (floor_positions.empty()) {
+    // Fallback if no floor tiles were generated (e.g., very small map or unlucky walk)
+    // Create a single floor tile in the center
+    int center_x = width_ / 2;
+    int center_y = height_ / 2;
+    if (isValidPosition(center_x, center_y)) {
+      tiles_[center_y][center_x] = Tile::FLOOR;
+      floor_positions.push_back({center_x, center_y});
+    } else {
+      spdlog::error("Map is too small to generate any floor tiles.");
+      return;
+    }
   }
 
-  std::random_device rd;
-  std::mt19937 g(rd());
-  std::shuffle(floor_positions.begin(), floor_positions.end(), g);
+  // Shuffle floor positions for random placement of entities
+  std::shuffle(floor_positions.begin(), floor_positions.end(), gen);
 
+  // Place player, enemies, items, and exit
+  if (floor_positions.size() < 2) {
+    spdlog::warn(
+        "Not enough floor tiles for both player and exit. They might share a position.");
+  }
+
+  // Ensure player start position is set
   start_player_position_ = floor_positions.back();
   floor_positions.pop_back();
 
-  Position orc_pos = floor_positions.back();
-  floor_positions.pop_back();
-  auto orc = std::make_unique<Orc>(orc_pos);
-  spdlog::debug("Map::generate: Placing Orc at ({}, {}).", orc_pos.x,
-                orc_pos.y);
-  addEnemy(orc_pos, std::move(orc));
+  // Ensure exit position is set
+  if (!floor_positions.empty()) {
+    Position exit_pos = floor_positions.back();
+    floor_positions.pop_back();
+    tiles_[exit_pos.y][exit_pos.x] = Tile::EXIT;
+  } else {
+    // If only one floor tile, player and exit share it
+    tiles_[start_player_position_.y][start_player_position_.x] = Tile::EXIT;
+    spdlog::warn("Only one floor tile generated. Player and Exit share the same position.");
+  }
 
-  Position goblin_pos = floor_positions.back();
-  floor_positions.pop_back();
-  auto goblin = std::make_unique<Goblin>(goblin_pos);
-  spdlog::debug("Map::generate: Placing Goblin at ({}, {}).", goblin_pos.x,
-                goblin_pos.y);
-  addEnemy(goblin_pos, std::move(goblin));
+  // Place enemies and items if there are remaining floor positions
+  if (!floor_positions.empty()) {
+    Position orc_pos = floor_positions.back();
+    floor_positions.pop_back();
+    auto orc = std::make_unique<Orc>(orc_pos);
+    spdlog::debug("Map::generate: Placing Orc at ({}, {}).", orc_pos.x,
+                  orc_pos.y);
+    addEnemy(orc_pos, std::move(orc));
+  }
 
-  Position potion_pos = floor_positions.back();
-  floor_positions.pop_back();
-  auto potion =
-      std::make_unique<Item>(Item::ItemType::HealthPotion, "Health Potion");
-  addItem(potion_pos, std::move(potion));
+  if (!floor_positions.empty()) {
+    Position goblin_pos = floor_positions.back();
+    floor_positions.pop_back();
+    auto goblin = std::make_unique<Goblin>(goblin_pos);
+    spdlog::debug("Map::generate: Placing Goblin at ({}, {}).", goblin_pos.x,
+                  goblin_pos.y);
+    addEnemy(goblin_pos, std::move(goblin));
+  }
 
-  Position exit_pos = floor_positions.back();
-  floor_positions.pop_back();
-  tiles_[exit_pos.y][exit_pos.x] = Tile::EXIT;
+  if (!floor_positions.empty()) {
+    Position potion_pos = floor_positions.back();
+    floor_positions.pop_back();
+    auto potion =
+        std::make_unique<Item>(Item::ItemType::HealthPotion, "Health Potion");
+    addItem(potion_pos, std::move(potion));
+  }
 }
-
 Tile Map::getTile(int x, int y) const {
   if (x < 0 || x >= width_ || y < 0 || y >= height_) {
     return Tile::WALL;

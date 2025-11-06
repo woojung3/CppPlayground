@@ -1,0 +1,35 @@
+~/w/CppPlayground/build main !1 ❯ make -j                                  jwlee@minipc
+[  1%] Built target generate_architecture_graph
+[  2%] Built target common_lib
+[  6%] Built target screen
+[  7%] Built target gtest
+[ 11%] Built target spdlog
+[ 21%] Built target benchmark
+[ 21%] Verifying architecture against allowed_architecture.dot
+[ 39%] Built target leveldb
+-- Architecture check passed: current_architecture.dot matches allowed_architecture.dot.
+[ 40%] Built target gmock
+[ 48%] Built target gtest_main
+[ 48%] Building CXX object application/domain/model/CMakeFiles/domain_model.dir/src/Map.cc.o
+[ 61%] Built target dom
+[ 62%] Built target leveldb_provider
+[ 63%] Built target benchmark_main
+[ 63%] Built target check_architecture
+[ 63%] Built target leveldbutil
+[ 64%] Built target gmock_main
+[ 76%] Built target component
+/home/jwlee/workspace/CppPlayground/tui_rog_game/application/domain/model/src/Map.cc:7:1: error: ‘Map’ does not name a type
+    7 | Map::Map(const MapDimensions& dimensions) : dimensions(dimensions) {
+      | ^~~
+/home/jwlee/workspace/CppPlayground/tui_rog_game/application/domain/model/src/Map.cc:54:1: error: ‘Map’ does not name a type
+   54 | Map::Map(std::vector<std::vector<Tile>> tiles) : tiles(std::move(tiles)) {
+      | ^~~
+/home/jwlee/workspace/CppPlayground/tui_rog_game/application/domain/model/src/Map.cc:63:1: error: ‘Tile’ does not name a type
+   63 | Tile Map::getTile(int x, int y) const {
+      | ^~~~
+/home/jwlee/workspace/CppPlayground/tui_rog_game/application/domain/model/src/Map.cc:70:7: error: ‘MapDimensions’ does not name a type
+   70 | const MapDimensions& Map::getDimensions() const {
+      |       ^~~~~~~~~~~~~
+make[2]: *** [application/domain/model/CMakeFiles/domain_model.dir/build.make:146: application/domain/model/CMakeFiles/domain_model.dir/src/Map.cc.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:931: application/domain/model/CMakeFiles/domain_model.dir/all] Error 2
+make: *** [Makefile:156: all] Error 2
