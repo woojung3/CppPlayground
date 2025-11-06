@@ -1,5 +1,4 @@
-#ifndef TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_LEVELDBADAPTER_H
-#define TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_LEVELDBADAPTER_H
+#pragma once
 
 // [Note] 이 모듈의 JSON 처리 방식은 명시적인 이해를 돕기 위해 수동
 // 직렬화/역직렬화 방식을 사용하고 있습니다. nlohmann::json 라이브러리의
@@ -35,4 +34,3 @@ private:
 } // namespace Adapter
 } // namespace TuiRogGame
 
-#endif // TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_LEVELDBADAPTER_H

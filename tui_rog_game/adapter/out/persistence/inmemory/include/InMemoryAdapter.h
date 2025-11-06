@@ -1,5 +1,4 @@
-#ifndef TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_INMEMORYADAPTER_H
-#define TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_INMEMORYADAPTER_H
+#pragma once
 
 #include "ILoadGameStatePort.h"
 #include "ISaveGameStatePort.h"
@@ -37,4 +36,3 @@ private:
 } // namespace Adapter
 } // namespace TuiRogGame
 
-#endif // TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_INMEMORYADAPTER_H

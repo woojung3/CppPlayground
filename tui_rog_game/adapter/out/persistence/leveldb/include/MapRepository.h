@@ -1,5 +1,4 @@
-#ifndef TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_MAPREPOSITORY_H
-#define TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_MAPREPOSITORY_H
+#pragma once
 
 #include <memory>            // For std::shared_ptr
 #include <nlohmann/json.hpp> // For JSON serialization
@@ -53,5 +52,3 @@ private:
 } // namespace Out
 } // namespace Adapter
 } // namespace TuiRogGame
-
-#endif // TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_MAPREPOSITORY_H

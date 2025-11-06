@@ -1,5 +1,4 @@
-#ifndef TUI_ROG_GAME_APPLICATION_PORT_OUT_INCLUDE_ISAVEGAMESTATEPORT_H
-#define TUI_ROG_GAME_APPLICATION_PORT_OUT_INCLUDE_ISAVEGAMESTATEPORT_H
+#pragma once
 
 #include "GameStateDTO.h"
 #include <memory>
@@ -22,4 +21,3 @@ public:
 } // namespace Port
 } // namespace TuiRogGame
 
-#endif // TUI_ROG_GAME_APPLICATION_PORT_OUT_INCLUDE_ISAVEGAMESTATEPORT_H

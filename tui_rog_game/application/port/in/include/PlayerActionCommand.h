@@ -1,5 +1,4 @@
-#ifndef TUI_ROG_GAME_APPLICATION_PORT_IN_INCLUDE_PLAYERACTIONCOMMAND_H
-#define TUI_ROG_GAME_APPLICATION_PORT_IN_INCLUDE_PLAYERACTIONCOMMAND_H
+#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -110,4 +109,3 @@ private:
 } // namespace Port
 } // namespace TuiRogGame
 
-#endif // TUI_ROG_GAME_APPLICATION_PORT_IN_INCLUDE_PLAYERACTIONCOMMAND_H

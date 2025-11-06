@@ -1,5 +1,4 @@
-#ifndef TUI_ROG_GAME_ASSEMBLY_INCLUDE_APPLICATIONBUILDER_H
-#define TUI_ROG_GAME_ASSEMBLY_INCLUDE_APPLICATIONBUILDER_H
+#pragma once
 
 #include "TuiAdapter.h" // For TuiAdapter type, which has a run() method
 #include <memory>
@@ -16,4 +15,3 @@ public:
 } // namespace Assembly
 } // namespace TuiRogGame
 
-#endif // TUI_ROG_GAME_ASSEMBLY_INCLUDE_APPLICATIONBUILDER_H

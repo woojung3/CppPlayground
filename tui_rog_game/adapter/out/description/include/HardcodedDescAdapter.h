@@ -1,5 +1,4 @@
-#ifndef TUI_ROG_GAME_ADAPTER_OUT_DESCRIPTION_HARDCODEDDESCADAPTER_H
-#define TUI_ROG_GAME_ADAPTER_OUT_DESCRIPTION_HARDCODEDDESCADAPTER_H
+#pragma once
 
 #include "GameStateDTO.h" // GameStateDTO를 포함
 #include "IGenerateDescriptionPort.h"
@@ -27,4 +26,3 @@ public:
 } // namespace Adapter
 } // namespace TuiRogGame
 
-#endif // TUI_ROG_GAME_ADAPTER_OUT_DESCRIPTION_HARDCODEDDESCADAPTER_H

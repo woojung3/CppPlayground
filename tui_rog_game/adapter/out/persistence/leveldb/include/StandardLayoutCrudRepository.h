@@ -1,5 +1,4 @@
-#ifndef TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_CRUDREPOSITORY_H
-#define TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_CRUDREPOSITORY_H
+#pragma once
 
 #include "LevelDbProvider.h" // LevelDbProvider 사용
 #include <algorithm>         // For std::transform
@@ -111,4 +110,3 @@ private:
 } // namespace Adapter
 } // namespace TuiRogGame
 
-#endif // TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_CRUDREPOSITORY_H

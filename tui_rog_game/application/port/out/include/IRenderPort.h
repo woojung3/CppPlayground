@@ -1,5 +1,4 @@
-#ifndef TUI_ROG_GAME_APPLICATION_PORT_OUT_INCLUDE_IRENDERPORT_H
-#define TUI_ROG_GAME_APPLICATION_PORT_OUT_INCLUDE_IRENDERPORT_H
+#pragma once
 
 #include "DomainEvent.h"
 #include "GameStateDTO.h"
@@ -29,4 +28,3 @@ public:
 } // namespace Port
 } // namespace TuiRogGame
 
-#endif // TUI_ROG_GAME_APPLICATION_PORT_OUT_INCLUDE_IRENDERPORT_H

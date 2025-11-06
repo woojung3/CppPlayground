@@ -1,5 +1,4 @@
-#ifndef TUI_ROG_GAME_APPLICATION_DOMAIN_EVENT_INCLUDE_GAMELOADEDEVENT_H
-#define TUI_ROG_GAME_APPLICATION_DOMAIN_EVENT_INCLUDE_GAMELOADEDEVENT_H
+#pragma once
 
 #include "DomainEvent.h"
 #include <string>
@@ -17,5 +16,3 @@ public:
 } // namespace Event
 } // namespace Domain
 } // namespace TuiRogGame
-
-#endif // TUI_ROG_GAME_APPLICATION_DOMAIN_EVENT_INCLUDE_GAMELOADEDEVENT_H
