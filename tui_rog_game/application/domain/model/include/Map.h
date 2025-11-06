@@ -47,6 +47,7 @@ public:
     void addEnemy(Position position, std::unique_ptr<Enemy> enemy); // Existing, but now public for persistence
     void addItem(Position position, std::unique_ptr<Item> item); // Existing, but now public for persistence
     void setStartPlayerPosition(Position pos) { start_player_position_ = pos; }
+    void setTile(int x, int y, Tile tile);
 
 
     // Gets an optional, non-owning reference to the enemy at a position.

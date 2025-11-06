@@ -1,0 +1,4 @@
+add_executable(GameEngineTest GameEngineTest.cc)
+target_link_libraries(GameEngineTest PRIVATE gtest_main gmock_main domain_service domain_model domain_event port_in port_out)
+include(GoogleTest)
+gtest_discover_tests(GameEngineTest)

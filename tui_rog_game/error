@@ -1,54 +1,168 @@
-~/workspace/CppPlayground/build main ⇡2 !17 ?5 ❯ make -j                                                                                       jwlee@minipc
-[  1%] Built target common_lib
-[  5%] Built target spdlog
-[  8%] Built target screen
-[ 10%] Built target gtest
-[ 21%] Built target benchmark
-[ 39%] Built target leveldb
-[ 39%] Building CXX object application/domain/model/CMakeFiles/domain_model.dir/src/Player.cc.o
-[ 39%] Built target gtest_main
-[ 39%] Built target benchmark_main
-[ 41%] Building CXX object application/domain/model/CMakeFiles/domain_model.dir/src/Enemy.cc.o
-[ 41%] Building CXX object application/domain/model/CMakeFiles/domain_model.dir/src/Goblin.cc.o
-[ 41%] Built target gmock
-[ 41%] Building CXX object application/domain/model/CMakeFiles/domain_model.dir/src/Orc.cc.o
-[ 41%] Building CXX object application/domain/model/CMakeFiles/domain_model.dir/src/Map.cc.o
-[ 42%] Built target leveldb_provider
-[ 62%] Built target dom
-[ 62%] Built target leveldbutil
-[ 64%] Built target gmock_main
-[ 76%] Built target component
-[ 78%] Linking CXX static library libdomain_model.a
-[ 80%] Built target domain_model
-[ 82%] Built target port_out
-[ 82%] Built target port_in
-[ 82%] Building CXX object application/domain/event/CMakeFiles/domain_event.dir/src/PlayerLeveledUpEvent.cc.o
-[ 82%] Building CXX object application/domain/model/test/CMakeFiles/PositionTest.dir/PositionTest.cc.o
-[ 82%] Building CXX object adapter/out/persistence/inmemory/CMakeFiles/inmemory_adapter.dir/src/InMemoryAdapter.cc.o
-[ 82%] Building CXX object adapter/out/description/CMakeFiles/description_adapter.dir/src/LlmAdapter.cc.o
-[ 83%] Building CXX object adapter/out/persistence/leveldb/CMakeFiles/leveldb_adapter.dir/src/LevelDbAdapter.cc.o
-[ 83%] Building CXX object adapter/out/persistence/leveldb/CMakeFiles/leveldb_adapter.dir/src/PlayerRepository.cc.o
-[ 83%] Building CXX object adapter/out/description/CMakeFiles/description_adapter.dir/src/HardcodedDescAdapter.cc.o
-[ 83%] Building CXX object adapter/out/persistence/leveldb/CMakeFiles/leveldb_adapter.dir/src/EnemyRepository.cc.o
-[ 83%] Building CXX object adapter/out/persistence/leveldb/CMakeFiles/leveldb_adapter.dir/src/MapRepository.cc.o
-[ 83%] Linking CXX static library libdomain_event.a
-[ 91%] Built target domain_event
-[ 91%] Building CXX object adapter/in/tui/CMakeFiles/adapter_in_tui.dir/src/TuiAdapter.cc.o
-[ 91%] Building CXX object application/domain/service/CMakeFiles/domain_service.dir/src/GameEngine.cc.o
-[ 92%] Linking CXX static library libinmemory_adapter.a
-/home/jwlee/workspace/CppPlayground/tui_rog_game/adapter/out/persistence/leveldb/src/EnemyRepository.cc: In member function ‘std::unique_ptr<TuiRogGame::Domain::Model::Enemy> TuiRogGame::Adapter::Out::Persistence::EnemyRepository::deserializeEnemy(const nlohmann::json_abi_v3_11_3::json&) const’:
-/home/jwlee/workspace/CppPlayground/tui_rog_game/adapter/out/persistence/leveldb/src/EnemyRepository.cc:71:44: error: ‘class TuiRogGame::Domain::Model::Enemy’ has no member named ‘setHealth’; did you mean ‘getHealth’?
-   71 |                                 enemy_ptr->setHealth(health); // Use the protected setter
-      |                                            ^~~~~~~~~
-      |                                            getHealth
-[ 92%] Built target inmemory_adapter
-[ 92%] Linking CXX executable PositionTest
-[ 92%] Built target PositionTest
-make[2]: *** [adapter/out/persistence/leveldb/CMakeFiles/leveldb_adapter.dir/build.make:146: adapter/out/persistence/leveldb/CMakeFiles/leveldb_adapter.dir/src/EnemyRepository.cc.o] Error 1
-make[2]: *** Waiting for unfinished jobs....
-[ 92%] Linking CXX static library libdomain_service.a
-[ 92%] Built target domain_service
-[ 94%] Linking CXX static library libadapter_in_tui.a
-[ 94%] Built target adapter_in_tui
-make[1]: *** [CMakeFiles/Makefile2:925: adapter/out/persistence/leveldb/CMakeFiles/leveldb_adapter.dir/all] Error 2
-make[1]: *** Waiting for unfinished jobs....
+~/workspace/CppPlayground/build main ⇡3 !4 ?1 ❯ ./application/domain/service/test/GameEngineTest                                            4s jwlee@minipc
+Running main() from /home/jwlee/workspace/CppPlayground/build/_deps/googletest-src/googletest/src/gtest_main.cc
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from GameEngineTest
+[ RUN      ] GameEngineTest.InitializeNewGame
+[2025-11-06 06:28:21.853] [info] GameEngine initialized.
+[2025-11-06 06:28:21.853] [info] GameEngine: Handling player action type: 0
+[2025-11-06 06:28:21.854] [info] New game initialized. Player: Waldo at (1, 1)
+[2025-11-06 06:28:21.854] [info] GameEngine: Entering processEvents. Event count: 1
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: PlayerMovedEvent: Player moved to (1, 1)
+[2025-11-06 06:28:21.854] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.854] [info] Game auto-saved.
+[       OK ] GameEngineTest.InitializeNewGame (0 ms)
+[ RUN      ] GameEngineTest.PlayerMoves
+[2025-11-06 06:28:21.854] [info] GameEngine initialized.
+[2025-11-06 06:28:21.854] [info] GameEngine: Handling player action type: 0
+[2025-11-06 06:28:21.854] [info] Game loaded. Player: Waldo at (1, 1)
+[2025-11-06 06:28:21.854] [info] GameEngine: Entering processEvents. Event count: 2
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: Game loaded successfully!
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: PlayerMovedEvent: Player moved to (1, 1)
+[2025-11-06 06:28:21.854] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.854] [info] Game auto-saved.
+[2025-11-06 06:28:21.854] [info] GameEngine: Handling player action type: 2
+[2025-11-06 06:28:21.854] [info] GameEngine: Entering processPlayerMove(dx=0, dy=1).
+[2025-11-06 06:28:21.854] [info] GameEngine: Player current position (1, 1), new position (1, 2).
+[2025-11-06 06:28:21.854] [info] GameEngine: Player moved to new position (1, 2).
+[2025-11-06 06:28:21.854] [info] GameEngine: PlayerMovedEvent created.
+[2025-11-06 06:28:21.854] [info] GameEngine: DescriptionGeneratedEvent created.
+[2025-11-06 06:28:21.854] [info] GameEngine: Entering processEvents. Event count: 2
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: PlayerMovedEvent: Player moved to (1, 2)
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: Moved description.
+[2025-11-06 06:28:21.854] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.854] [info] Game auto-saved.
+[       OK ] GameEngineTest.PlayerMoves (0 ms)
+[ RUN      ] GameEngineTest.ComplexScenario
+[2025-11-06 06:28:21.854] [info] GameEngine initialized.
+[2025-11-06 06:28:21.854] [info] GameEngine: Handling player action type: 0
+[2025-11-06 06:28:21.854] [info] Game loaded. Player: Waldo at (1, 1)
+[2025-11-06 06:28:21.854] [info] GameEngine: Entering processEvents. Event count: 2
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: Game loaded successfully!
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: PlayerMovedEvent: Player moved to (1, 1)
+[2025-11-06 06:28:21.854] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.854] [info] Game auto-saved.
+[2025-11-06 06:28:21.854] [info] GameEngine: Handling player action type: 2
+[2025-11-06 06:28:21.854] [info] GameEngine: Entering processPlayerMove(dx=0, dy=1).
+[2025-11-06 06:28:21.854] [info] GameEngine: Player current position (1, 1), new position (1, 2).
+[2025-11-06 06:28:21.854] [info] GameEngine: Player moved to new position (1, 2).
+[2025-11-06 06:28:21.854] [info] GameEngine: PlayerMovedEvent created.
+[2025-11-06 06:28:21.854] [info] GameEngine: DescriptionGeneratedEvent created.
+[2025-11-06 06:28:21.854] [info] GameEngine: Entering processEvents. Event count: 2
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: PlayerMovedEvent: Player moved to (1, 2)
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: Initial description.
+[2025-11-06 06:28:21.854] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.854] [info] Game auto-saved.
+[2025-11-06 06:28:21.854] [info] GameEngine: Handling player action type: 2
+[2025-11-06 06:28:21.854] [info] GameEngine: Entering processPlayerMove(dx=0, dy=1).
+[2025-11-06 06:28:21.854] [info] GameEngine: Player move blocked to (1, 3). Wall detected.
+[2025-11-06 06:28:21.854] [info] GameEngine: Entering processEvents. Event count: 0
+[2025-11-06 06:28:21.854] [info] GameEngine: No new events to process.
+[2025-11-06 06:28:21.854] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.854] [info] Game auto-saved.
+[2025-11-06 06:28:21.854] [info] GameEngine: Handling player action type: 5
+[2025-11-06 06:28:21.854] [info] Combat started with adjacent enemy Orc at (1, 3).
+[2025-11-06 06:28:21.854] [info] Player attacked Orc for 25 damage. Orc's health: 175
+[2025-11-06 06:28:21.854] [info] Orc attacked player for 15 damage. Player's health: 85
+[2025-11-06 06:28:21.854] [info] GameEngine: Entering processEvents. Event count: 3
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: CombatStartedEvent: Combat started with Orc Orc. HP: 200
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: Player attacked Orc for 25 damage. Orc's health: 175.
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: Orc attacked player for 15 damage. Player's health: 85.
+[2025-11-06 06:28:21.854] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.854] [info] Game auto-saved.
+[2025-11-06 06:28:21.854] [info] GameEngine: Handling player action type: 5
+[2025-11-06 06:28:21.854] [info] Player attacked Orc for 25 damage. Orc's health: 150
+[2025-11-06 06:28:21.854] [info] Orc attacked player for 15 damage. Player's health: 70
+[2025-11-06 06:28:21.854] [info] GameEngine: Entering processEvents. Event count: 2
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: Player attacked Orc for 25 damage. Orc's health: 150.
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: Orc attacked player for 15 damage. Player's health: 70.
+[2025-11-06 06:28:21.854] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.854] [info] Game auto-saved.
+[2025-11-06 06:28:21.854] [info] GameEngine: Handling player action type: 5
+[2025-11-06 06:28:21.854] [info] Player attacked Orc for 25 damage. Orc's health: 125
+[2025-11-06 06:28:21.854] [info] Orc attacked player for 15 damage. Player's health: 55
+[2025-11-06 06:28:21.854] [info] GameEngine: Entering processEvents. Event count: 2
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: Player attacked Orc for 25 damage. Orc's health: 125.
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: Orc attacked player for 15 damage. Player's health: 55.
+[2025-11-06 06:28:21.854] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.854] [info] Game auto-saved.
+[2025-11-06 06:28:21.854] [info] GameEngine: Handling player action type: 5
+[2025-11-06 06:28:21.854] [info] Player attacked Orc for 25 damage. Orc's health: 100
+[2025-11-06 06:28:21.854] [info] Orc attacked player for 15 damage. Player's health: 40
+[2025-11-06 06:28:21.854] [info] GameEngine: Entering processEvents. Event count: 2
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: Player attacked Orc for 25 damage. Orc's health: 100.
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: Orc attacked player for 15 damage. Player's health: 40.
+[2025-11-06 06:28:21.854] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.854] [info] Game auto-saved.
+[2025-11-06 06:28:21.854] [info] GameEngine: Handling player action type: 5
+[2025-11-06 06:28:21.854] [info] Player attacked Orc for 25 damage. Orc's health: 75
+[2025-11-06 06:28:21.854] [info] Orc attacked player for 15 damage. Player's health: 25
+[2025-11-06 06:28:21.854] [info] GameEngine: Entering processEvents. Event count: 2
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: Player attacked Orc for 25 damage. Orc's health: 75.
+[2025-11-06 06:28:21.854] [info] GameEngine: Processing event: Orc attacked player for 15 damage. Player's health: 25.
+[2025-11-06 06:28:21.854] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.854] [info] Game auto-saved.
+[2025-11-06 06:28:21.854] [info] GameEngine: Handling player action type: 5
+[2025-11-06 06:28:21.854] [info] Player attacked Orc for 25 damage. Orc's health: 50
+[2025-11-06 06:28:21.854] [info] Orc attacked player for 15 damage. Player's health: 10
+[2025-11-06 06:28:21.854] [info] GameEngine: Entering processEvents. Event count: 2
+[2025-11-06 06:28:21.855] [info] GameEngine: Processing event: Player attacked Orc for 25 damage. Orc's health: 50.
+[2025-11-06 06:28:21.855] [info] GameEngine: Processing event: Orc attacked player for 15 damage. Player's health: 10.
+[2025-11-06 06:28:21.855] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.855] [info] Game auto-saved.
+[2025-11-06 06:28:21.855] [info] GameEngine: Handling player action type: 5
+[2025-11-06 06:28:21.855] [info] Player attacked Orc for 25 damage. Orc's health: 25
+[2025-11-06 06:28:21.855] [info] Orc attacked player for 15 damage. Player's health: 0
+[2025-11-06 06:28:21.855] [info] Player defeated!
+[2025-11-06 06:28:21.855] [info] GameEngine: Entering processEvents. Event count: 3
+[2025-11-06 06:28:21.855] [info] GameEngine: Processing event: Player attacked Orc for 25 damage. Orc's health: 25.
+[2025-11-06 06:28:21.855] [info] GameEngine: Processing event: Orc attacked player for 15 damage. Player's health: 0.
+[2025-11-06 06:28:21.855] [info] GameEngine: Processing event: You died! Game Over.
+[2025-11-06 06:28:21.855] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.855] [info] Game auto-saved.
+[2025-11-06 06:28:21.855] [info] GameEngine: Handling player action type: 5
+[2025-11-06 06:28:21.855] [info] Player attacked Orc for 25 damage. Orc's health: 0
+[2025-11-06 06:28:21.855] [info] Orc defeated! Player gained 50 XP.
+[2025-11-06 06:28:21.855] [info] GameEngine: Entering processEvents. Event count: 2
+[2025-11-06 06:28:21.855] [info] GameEngine: Processing event: Player attacked Orc for 25 damage. Orc's health: 0.
+[2025-11-06 06:28:21.855] [info] GameEngine: Processing event: Orc defeated! Player gained 50 XP.
+[2025-11-06 06:28:21.855] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.855] [info] Game auto-saved.
+[2025-11-06 06:28:21.855] [info] GameEngine: Handling player action type: 5
+[2025-11-06 06:28:21.855] [warning] Player tried to attack but no adjacent enemy found.
+[2025-11-06 06:28:21.855] [info] GameEngine: Entering processEvents. Event count: 0
+[2025-11-06 06:28:21.855] [info] GameEngine: No new events to process.
+[2025-11-06 06:28:21.855] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.855] [info] Game auto-saved.
+[2025-11-06 06:28:21.855] [info] GameEngine: Handling player action type: 5
+[2025-11-06 06:28:21.855] [warning] Player tried to attack but no adjacent enemy found.
+[2025-11-06 06:28:21.855] [info] GameEngine: Entering processEvents. Event count: 0
+[2025-11-06 06:28:21.855] [info] GameEngine: No new events to process.
+[2025-11-06 06:28:21.855] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.855] [info] Game auto-saved.
+[2025-11-06 06:28:21.855] [info] GameEngine: Handling player action type: 2
+[2025-11-06 06:28:21.855] [info] GameEngine: Entering processPlayerMove(dx=0, dy=1).
+[2025-11-06 06:28:21.855] [info] GameEngine: Player current position (1, 2), new position (1, 3).
+[2025-11-06 06:28:21.855] [info] GameEngine: Player moved to new position (1, 3).
+[2025-11-06 06:28:21.855] [info] GameEngine: PlayerMovedEvent created.
+[2025-11-06 06:28:21.855] [info] GameEngine: DescriptionGeneratedEvent created.
+[2025-11-06 06:28:21.855] [info] GameEngine: Entering processEvents. Event count: 2
+[2025-11-06 06:28:21.855] [info] GameEngine: Processing event: PlayerMovedEvent: Player moved to (1, 3)
+[2025-11-06 06:28:21.855] [info] GameEngine: Processing event: Found a health potion.
+[2025-11-06 06:28:21.855] [info] GameEngine: Exiting processEvents.
+[2025-11-06 06:28:21.855] [info] Game auto-saved.
+/home/jwlee/workspace/CppPlayground/tui_rog_game/application/domain/service/test/GameEngineTest.cc:157: Failure
+Actual function call count doesn't match EXPECT_CALL(*primary_desc_port_ptr_, generateDescription(_))...
+         Expected: to be called at least 3 times
+           Actual: called twice - unsatisfied and active
+
+[  FAILED  ] GameEngineTest.ComplexScenario (0 ms)
+[----------] 3 tests from GameEngineTest (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (1 ms total)
+[  PASSED  ] 2 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] GameEngineTest.ComplexScenario
+
+ 1 FAILED TEST

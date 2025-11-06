@@ -215,6 +215,12 @@ std::unique_ptr<Item> Map::takeItemAt(const Position& position) {
     return nullptr;
 }
 
+void Map::setTile(int x, int y, Tile tile) {
+    if (isValidPosition(x, y)) {
+        tiles_[y][x] = tile;
+    }
+}
+
 } // namespace Model
 } // namespace Domain
 } // namespace TuiRogGame
