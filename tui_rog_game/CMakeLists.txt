@@ -108,15 +108,15 @@ add_executable(tui_rog_game main.cc)
 # Link all libraries to the main executable
 target_link_libraries(tui_rog_game
     PRIVATE
-        adapter_in_tui
-        persistence_adapter
-        description_adapter
-        domain_model
-        domain_event
-        domain_service
-        port_in
-        port_out
-        assembly
+        tui_rog_game::adapter::in::tui
+        tui_rog_game::adapter::out::persistence
+        tui_rog_game::adapter::out::description
+        tui_rog_game::domain::model
+        tui_rog_game::domain::event
+        tui_rog_game::domain::service
+        tui_rog_game::port::in
+        tui_rog_game::port::out
+        tui_rog_game::assembly
 )
 
 target_link_libraries(tui_rog_game 
