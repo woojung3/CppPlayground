@@ -10,7 +10,7 @@ namespace Event {
 class GameLoadedEvent : public DomainEvent {
 public:
   GameLoadedEvent() : DomainEvent(Type::GameLoaded) {}
-  std::string toString() const override { return "Game loaded successfully!"; }
+  std::string toString() const override { return "GameLoadedEvent"; }
 };
 
 } // namespace Event

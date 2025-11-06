@@ -20,6 +20,7 @@ target_include_directories(description_adapter
 target_link_libraries(description_adapter
     PUBLIC
         tui_rog_game::port::out
+        tui_rog_game::domain::event
     PRIVATE
         httplib # cpp-httplib FetchContent target
         nlohmann_json::nlohmann_json # nlohmann/json FetchContent target

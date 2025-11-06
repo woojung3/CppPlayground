@@ -17,7 +17,7 @@ public:
   ~HardcodedDescAdapter() override = default;
 
   std::string
-  generateDescription(const Port::Out::GameStateDTO &game_state) override;
+  generateDescription(const Port::Out::GameStateDTO &game_state, const Domain::Event::DomainEvent& event) override;
 };
 
 } // namespace Description

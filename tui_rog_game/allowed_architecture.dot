@@ -14,6 +14,7 @@ digraph G {
   "tui_rog_game::adapter::in::tui" -> "tui_rog_game::domain::event" [style=dashed];
   "tui_rog_game::adapter::in::tui" -> "tui_rog_game::port::in" [style=dashed];
   "tui_rog_game::adapter::in::tui" -> "tui_rog_game::port::out" [style=dashed];
+  "tui_rog_game::adapter::out::description" -> "tui_rog_game::domain::event" [style=solid];
   "tui_rog_game::adapter::out::description" -> "tui_rog_game::port::out" [style=solid];
   "tui_rog_game::adapter::out::persistence" -> "tui_rog_game::adapter::out::persistence::inmemory" [style=dotted];
   "tui_rog_game::adapter::out::persistence" -> "tui_rog_game::adapter::out::persistence::leveldb" [style=dotted];

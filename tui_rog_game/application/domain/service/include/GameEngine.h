@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DomainEvent.h"
+#include "DescriptionGeneratedEvent.h" // Added for DescriptionGeneratedEvent
 #include "IGenerateDescriptionPort.h"
 #include "IGetPlayerActionUseCase.h"
 #include "ILoadGameStatePort.h"
@@ -54,6 +55,10 @@ private:
 
 public:
   void toggleDescriptionPort();
+
+private:
+  std::unique_ptr<Domain::Event::DescriptionGeneratedEvent> createDescriptionEvent(const Port::Out::GameStateDTO& game_state, const Domain::Event::DomainEvent& event);
+
 };
 
 } // namespace Service

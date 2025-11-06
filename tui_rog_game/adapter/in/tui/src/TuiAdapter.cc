@@ -315,9 +315,6 @@ void TuiAdapter::run() {
     return false; // Event not a character event, return false
   });
 
-  game_engine_->handlePlayerAction(
-      Port::In::PlayerActionCommand(Port::In::PlayerActionCommand::INITIALIZE));
-
   screen_.SetCursor(ftxui::Screen::Cursor{0, 0});
 
   screen_.Loop(component);
