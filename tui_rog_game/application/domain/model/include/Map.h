@@ -76,12 +76,6 @@ private:
 };
 
 // Position needs a less-than operator to be used as a key in std::map.
-inline bool operator<(const Position& lhs, const Position& rhs) {
-    if (lhs.y < rhs.y) return true;
-    if (lhs.y > rhs.y) return false;
-    return lhs.x < rhs.x;
-}
-
 } // namespace Model
 } // namespace Domain
 } // namespace TuiRogGame

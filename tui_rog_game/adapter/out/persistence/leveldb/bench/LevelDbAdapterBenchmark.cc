@@ -7,6 +7,8 @@
 #include "Map.h"
 #include "Item.h"
 #include "Enemy.h"
+#include "Orc.h"
+#include "Goblin.h"
 #include "Stats.h"
 #include "Position.h"
 #include "PlayerCoreStats.h"
@@ -65,9 +67,9 @@ Port::Out::GameStateDTO createDummyGameState() {
     tiles[10][10] = Domain::Model::Tile::EXIT;
 
     std::map<Domain::Model::Position, std::unique_ptr<Domain::Model::Enemy>> enemies;
-    Domain::Model::Stats goblinStats{5, 5, 0, 10};
-    enemies.emplace(Domain::Model::Position{1, 1}, std::make_unique<Domain::Model::Enemy>(Domain::Model::Enemy::EnemyType::Goblin, "GoblinGrunt", goblinStats, Domain::Model::Position{1, 1}));
-    enemies.emplace(Domain::Model::Position{2, 2}, std::make_unique<Domain::Model::Enemy>(Domain::Model::Enemy::EnemyType::Goblin, "GoblinArcher", goblinStats, Domain::Model::Position{2, 2}));
+    // Domain::Model::Stats goblinStats{5, 5, 0, 10}; // No longer needed as stats are in Goblin constructor
+    enemies.emplace(Domain::Model::Position{1, 1}, std::make_unique<Domain::Model::Goblin>(Domain::Model::Position{1, 1}));
+    enemies.emplace(Domain::Model::Position{2, 2}, std::make_unique<Domain::Model::Orc>(Domain::Model::Position{2, 2})); // Example Orc
 
     std::map<Domain::Model::Position, std::unique_ptr<Domain::Model::Item>> items;
     items.emplace(Domain::Model::Position{3, 3}, std::make_unique<Domain::Model::Item>(Domain::Model::Item::ItemType::HealthPotion, "Large Health Potion"));

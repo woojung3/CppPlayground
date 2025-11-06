@@ -19,7 +19,7 @@ namespace TuiRogGame {
 
                 nlohmann::json EnemyRepository::serializeEnemy(const Domain::Model::Enemy& enemy) const {
                     nlohmann::json j;
-                    j["type"] = static_cast<int>(enemy.getType()); // Store enum as int
+                    j["type_name"] = enemy.getTypeName(); // Store type name as string
                     j["name"] = enemy.getName();
                     j["health"] = enemy.getHealth();
                     j["stats"]["strength"] = enemy.getStats().strength;
@@ -31,12 +31,12 @@ namespace TuiRogGame {
                     return j;
                 }
 
-                std::optional<Domain::Model::Enemy> EnemyRepository::deserializeEnemy(const nlohmann::json& j) const {
+                std::unique_ptr<Domain::Model::Enemy> EnemyRepository::deserializeEnemy(const nlohmann::json& j) const {
                     try {
-                        if (j.contains("type") && j.contains("name") && j.contains("health") && j.contains("stats") && j.contains("position")) {
-                            Domain::Model::Enemy::EnemyType type = static_cast<Domain::Model::Enemy::EnemyType>(j["type"].get<int>());
+                        if (j.contains("type_name") && j.contains("name") && j.contains("health") && j.contains("stats") && j.contains("position")) {
+                            std::string type_name = j["type_name"].get<std::string>();
                             std::string name = j["name"].get<std::string>();
-                            int health = j["health"].get<int>(); // Read health, but Enemy constructor might override
+                            int health = j["health"].get<int>();
                             
                             Domain::Model::Stats stats;
                             stats.strength = j["stats"]["strength"].get<int>();
@@ -48,18 +48,36 @@ namespace TuiRogGame {
                             position.x = j["position"]["x"].get<int>();
                             position.y = j["position"]["y"].get<int>();
 
-                            // Construct Enemy. Note: Enemy constructor sets health based on vitality.
-                            // If current health needs to be persisted independently, Enemy class needs modification.
-                            Domain::Model::Enemy enemy(type, name, stats, position);
-                            // If Enemy had a setHealth method, we would call enemy.setHealth(health) here.
-                            // For now, the health from JSON is effectively ignored if constructor sets it.
-                            return enemy;
+                            std::unique_ptr<Domain::Model::Enemy> enemy_ptr;
+
+                            if (type_name == "Orc") {
+                                enemy_ptr = std::make_unique<Domain::Model::Orc>(position);
+                            } else if (type_name == "Goblin") {
+                                enemy_ptr = std::make_unique<Domain::Model::Goblin>(position);
+                            } else {
+                                spdlog::error("EnemyRepository: Unknown enemy type_name: {}", type_name);
+                                return nullptr;
+                            }
+
+                            // After construction, update common properties like health and stats
+                            // Note: Derived class constructors set initial stats and health. We need to override if persisted values differ.
+                            // For simplicity, we'll assume the name and stats from JSON are the source of truth.
+                            // This might require adding setters to the Enemy base class or derived classes.
+                            // For now, we'll directly set the health_ and stats_ if possible, or rely on the constructor.
+                            // A more robust solution would involve passing stats and name to the derived constructors.
+                            // For this refactoring, we'll assume the derived constructors set the base stats and name,
+                            // and we only need to update the current health.
+                            if (enemy_ptr) {
+                                enemy_ptr->stats_.health = health; // Directly set health in stats_
+                            }
+
+                            return enemy_ptr;
                         }
-                        spdlog::error("EnemyRepository: JSON missing required fields.");
-                        return std::nullopt;
+                        spdlog::error("EnemyRepository: JSON missing required fields for deserialization.");
+                        return nullptr;
                     } catch (const nlohmann::json::exception& e) {
                         spdlog::error("EnemyRepository: Failed to deserialize Enemy JSON: {}", e.what());
-                        return std::nullopt;
+                        return nullptr;
                     }
                 }
 
@@ -70,14 +88,14 @@ namespace TuiRogGame {
                     spdlog::debug("EnemyRepository: Added Put for key '{}' to batch.", lower_key);
                 }
 
-                std::optional<Domain::Model::Enemy> EnemyRepository::findById(const std::string& key) {
+                std::unique_ptr<Domain::Model::Enemy> EnemyRepository::findById(const std::string& key) {
                     auto& provider = LevelDbProvider::getInstance();
 
                     std::string lower_key = toLower(key);
                     auto value_str_opt = provider.Get(lower_key);
 
                     if (!value_str_opt) {
-                        return std::nullopt; // Not found or error already logged by provider
+                        return nullptr; // Not found or error already logged by provider
                     }
                     
                     try {
@@ -85,7 +103,7 @@ namespace TuiRogGame {
                         return deserializeEnemy(j);
                     } catch (const nlohmann::json::exception& e) {
                         spdlog::error("EnemyRepository: Failed to parse JSON for key '{}': {}", lower_key, e.what());
-                        return std::nullopt;
+                        return nullptr;
                     }
                 }
 

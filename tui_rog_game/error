@@ -1,43 +1,54 @@
-~/workspace/CppPlayground/build main ⇡1 !20 ?3 ❯ make -j                                                                             ✘ INT 13s jwlee@minipc
-[  3%] Built target screen
-[  3%] Built target common_lib
-[ 12%] Built target benchmark
-[ 16%] Built target spdlog
-[ 16%] Built target gtest
-[ 36%] Built target leveldb
-[ 38%] Built target benchmark_main
-[ 41%] Built target domain_model
-[ 43%] Built target gtest_main
-[ 63%] Built target dom
-[ 63%] Built target leveldbutil
-[ 63%] Built target gmock
-[ 65%] Built target port_in
-[ 67%] Built target leveldb_provider
-[ 69%] Built target port_out
-[ 74%] Built target domain_event
-[ 76%] Built target gmock_main
-[ 89%] Built target component
-[ 89%] Built target inmemory_adapter
-[ 89%] Built target domain_service
-[ 90%] Building CXX object adapter/out/description/CMakeFiles/description_adapter.dir/src/LlmAdapter.cc.o
-[ 92%] Building CXX object adapter/out/description/CMakeFiles/description_adapter.dir/src/HardcodedDescAdapter.cc.o
-[ 94%] Built target leveldb_adapter
+~/workspace/CppPlayground/build main ⇡2 !17 ?5 ❯ make -j                                                                                       jwlee@minipc
+[  1%] Built target common_lib
+[  5%] Built target spdlog
+[  8%] Built target screen
+[ 10%] Built target gtest
+[ 21%] Built target benchmark
+[ 39%] Built target leveldb
+[ 39%] Building CXX object application/domain/model/CMakeFiles/domain_model.dir/src/Player.cc.o
+[ 39%] Built target gtest_main
+[ 39%] Built target benchmark_main
+[ 41%] Building CXX object application/domain/model/CMakeFiles/domain_model.dir/src/Enemy.cc.o
+[ 41%] Building CXX object application/domain/model/CMakeFiles/domain_model.dir/src/Goblin.cc.o
+[ 41%] Built target gmock
+[ 41%] Building CXX object application/domain/model/CMakeFiles/domain_model.dir/src/Orc.cc.o
+[ 41%] Building CXX object application/domain/model/CMakeFiles/domain_model.dir/src/Map.cc.o
+[ 42%] Built target leveldb_provider
+[ 62%] Built target dom
+[ 62%] Built target leveldbutil
+[ 64%] Built target gmock_main
+[ 76%] Built target component
+[ 78%] Linking CXX static library libdomain_model.a
+[ 80%] Built target domain_model
+[ 82%] Built target port_out
+[ 82%] Built target port_in
+[ 82%] Building CXX object application/domain/event/CMakeFiles/domain_event.dir/src/PlayerLeveledUpEvent.cc.o
+[ 82%] Building CXX object application/domain/model/test/CMakeFiles/PositionTest.dir/PositionTest.cc.o
+[ 82%] Building CXX object adapter/out/persistence/inmemory/CMakeFiles/inmemory_adapter.dir/src/InMemoryAdapter.cc.o
+[ 82%] Building CXX object adapter/out/description/CMakeFiles/description_adapter.dir/src/LlmAdapter.cc.o
+[ 83%] Building CXX object adapter/out/persistence/leveldb/CMakeFiles/leveldb_adapter.dir/src/LevelDbAdapter.cc.o
+[ 83%] Building CXX object adapter/out/persistence/leveldb/CMakeFiles/leveldb_adapter.dir/src/PlayerRepository.cc.o
+[ 83%] Building CXX object adapter/out/description/CMakeFiles/description_adapter.dir/src/HardcodedDescAdapter.cc.o
+[ 83%] Building CXX object adapter/out/persistence/leveldb/CMakeFiles/leveldb_adapter.dir/src/EnemyRepository.cc.o
+[ 83%] Building CXX object adapter/out/persistence/leveldb/CMakeFiles/leveldb_adapter.dir/src/MapRepository.cc.o
+[ 83%] Linking CXX static library libdomain_event.a
+[ 91%] Built target domain_event
+[ 91%] Building CXX object adapter/in/tui/CMakeFiles/adapter_in_tui.dir/src/TuiAdapter.cc.o
+[ 91%] Building CXX object application/domain/service/CMakeFiles/domain_service.dir/src/GameEngine.cc.o
+[ 92%] Linking CXX static library libinmemory_adapter.a
+/home/jwlee/workspace/CppPlayground/tui_rog_game/adapter/out/persistence/leveldb/src/EnemyRepository.cc: In member function ‘std::unique_ptr<TuiRogGame::Domain::Model::Enemy> TuiRogGame::Adapter::Out::Persistence::EnemyRepository::deserializeEnemy(const nlohmann::json_abi_v3_11_3::json&) const’:
+/home/jwlee/workspace/CppPlayground/tui_rog_game/adapter/out/persistence/leveldb/src/EnemyRepository.cc:71:44: error: ‘class TuiRogGame::Domain::Model::Enemy’ has no member named ‘setHealth’; did you mean ‘getHealth’?
+   71 |                                 enemy_ptr->setHealth(health); // Use the protected setter
+      |                                            ^~~~~~~~~
+      |                                            getHealth
+[ 92%] Built target inmemory_adapter
+[ 92%] Linking CXX executable PositionTest
+[ 92%] Built target PositionTest
+make[2]: *** [adapter/out/persistence/leveldb/CMakeFiles/leveldb_adapter.dir/build.make:146: adapter/out/persistence/leveldb/CMakeFiles/leveldb_adapter.dir/src/EnemyRepository.cc.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+[ 92%] Linking CXX static library libdomain_service.a
+[ 92%] Built target domain_service
+[ 94%] Linking CXX static library libadapter_in_tui.a
 [ 94%] Built target adapter_in_tui
-[ 94%] Built target LevelDbAdapterBenchmark
-[ 94%] Linking CXX static library libdescription_adapter.a
-[ 94%] Built target description_adapter
-[ 94%] Building CXX object adapter/out/description/test/CMakeFiles/LlmAdapterTest.dir/LlmAdapterTest.cc.o
-[ 94%] Building CXX object assembly/CMakeFiles/assembly.dir/src/ApplicationBuilder.cc.o
-/home/jwlee/workspace/CppPlayground/tui_rog_game/adapter/out/description/test/LlmAdapterTest.cc: In member function ‘virtual void LlmAdapterTest_GeneratesNonEmptyDescription_Test::TestBody()’:
-/home/jwlee/workspace/CppPlayground/tui_rog_game/adapter/out/description/test/LlmAdapterTest.cc:27:59: error: cannot convert ‘TuiRogGame::Domain::Model::Position’ to ‘const TuiRogGame::Port::Out::GameStateDTO&’
-   27 |     std::string description = adapter.generateDescription(test_position);
-      |                                                           ^~~~~~~~~~~~~
-      |                                                           |
-      |                                                           TuiRogGame::Domain::Model::Position
-In file included from /home/jwlee/workspace/CppPlayground/tui_rog_game/adapter/out/description/test/LlmAdapterTest.cc:2:
-/home/jwlee/workspace/CppPlayground/tui_rog_game/adapter/out/description/include/LlmAdapter.h:16:68: note:   initializing argument 1 of ‘virtual std::string TuiRogGame::Adapter::Out::Description::LlmAdapter::generateDescription(const TuiRogGame::Port::Out::GameStateDTO&)’
-   16 |     std::string generateDescription(const Port::Out::GameStateDTO& game_state) override;
-      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
-make[2]: *** [adapter/out/description/test/CMakeFiles/LlmAdapterTest.dir/build.make:76: adapter/out/description/test/CMakeFiles/LlmAdapterTest.dir/LlmAdapterTest.cc.o] Error 1
-make[1]: *** [CMakeFiles/Makefile2:1000: adapter/out/description/test/CMakeFiles/LlmAdapterTest.dir/all] Error 2
+make[1]: *** [CMakeFiles/Makefile2:925: adapter/out/persistence/leveldb/CMakeFiles/leveldb_adapter.dir/all] Error 2
 make[1]: *** Waiting for unfinished jobs....

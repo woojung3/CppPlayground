@@ -4,28 +4,28 @@ namespace TuiRogGame {
 namespace Domain {
 namespace Model {
 
-Enemy::Enemy(EnemyType type, std::string name, Stats stats, Position position)
-    : type_(type),
-      name_(name),
-      stats_(stats),
-      position_(position) {
-    health_ = getMaxHealth(); // Initialize current health to max health
+Enemy::Enemy(std::string name, std::string type_name, Stats stats, Position position)
+    : name_(std::move(name)),
+      type_name_(std::move(type_name)),
+      stats_(std::move(stats)),
+      position_(std::move(position)) {}
+
+std::string Enemy::getTypeName() const {
+    return type_name_;
 }
 
-int Enemy::getMaxHealth() const {
-    // Example: 10 base health + 5 health per vitality point
-    return 10 + (stats_.vitality * 5);
+int Enemy::getHealth() const {
+    return stats_.health;
 }
 
 int Enemy::getAttackPower() const {
-    // Example: 5 base attack + 2 attack per strength point
-    return 5 + (stats_.strength * 2);
+    return stats_.strength; // Assuming strength directly contributes to attack power
 }
 
-void Enemy::takeDamage(int amount) {
-    health_ -= amount;
-    if (health_ < 0) {
-        health_ = 0;
+void Enemy::takeDamage(int damage) {
+    stats_.health -= damage;
+    if (stats_.health < 0) {
+        stats_.health = 0;
     }
 }
 

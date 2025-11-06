@@ -2,11 +2,12 @@
 #define TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_ENEMYREPOSITORY_H
 
 #include <string>
-#include <optional>
-#include <memory> // For std::shared_ptr
+#include <memory> // For std::unique_ptr
 #include <nlohmann/json.hpp> // For JSON serialization
 
 #include "Enemy.h" // Domain Model Enemy
+#include "Orc.h" // For Orc derived class
+#include "Goblin.h" // For Goblin derived class
 #include "Stats.h" // For Enemy's Stats
 #include "Position.h" // For Enemy's Position
 
@@ -20,7 +21,7 @@ namespace TuiRogGame {
                     explicit EnemyRepository();
 
                     void saveForBatch(const std::string& key, const Domain::Model::Enemy& enemy);
-                    std::optional<Domain::Model::Enemy> findById(const std::string& key);
+                    std::unique_ptr<Domain::Model::Enemy> findById(const std::string& key);
                     void deleteById(const std::string& key);
 
                 private:
@@ -29,7 +30,7 @@ namespace TuiRogGame {
 
                     // Serialization/Deserialization helpers
                     nlohmann::json serializeEnemy(const Domain::Model::Enemy& enemy) const;
-                    std::optional<Domain::Model::Enemy> deserializeEnemy(const nlohmann::json& j) const;
+                    std::unique_ptr<Domain::Model::Enemy> deserializeEnemy(const nlohmann::json& j) const;
                 };
 
             } // namespace Persistence

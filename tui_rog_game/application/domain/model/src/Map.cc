@@ -1,4 +1,6 @@
 #include "Map.h"
+#include "Orc.h" // Include for Orc class
+#include "Goblin.h" // Include for Goblin class
 #include <stdexcept>
 #include <random>     // For std::random_device, std::mt19937
 #include <algorithm>  // For std::shuffle
@@ -41,7 +43,7 @@ Map::Map(const Map& other)
       start_player_position_(other.start_player_position_)
 {
     for (const auto& pair : other.enemies_) {
-        enemies_.emplace(pair.first, std::make_unique<Enemy>(*pair.second));
+        enemies_.emplace(pair.first, pair.second->clone());
     }
     for (const auto& pair : other.items_) {
         items_.emplace(pair.first, std::make_unique<Item>(*pair.second));
@@ -97,13 +99,15 @@ void Map::generate() {
     // Place Orc
     Position orc_pos = floor_positions.back();
     floor_positions.pop_back();
-    auto orc = std::make_unique<Enemy>(Enemy::EnemyType::Orc, "Orc", Stats{10, 2, 1, 10}, orc_pos);
+    auto orc = std::make_unique<Orc>(orc_pos);
+    spdlog::debug("Map::generate: Placing Orc at ({}, {}).", orc_pos.x, orc_pos.y);
     addEnemy(orc_pos, std::move(orc));
 
     // Place Goblin
     Position goblin_pos = floor_positions.back();
     floor_positions.pop_back();
-    auto goblin = std::make_unique<Enemy>(Enemy::EnemyType::Goblin, "Goblin", Stats{5, 5, 1, 5}, goblin_pos);
+    auto goblin = std::make_unique<Goblin>(goblin_pos);
+    spdlog::debug("Map::generate: Placing Goblin at ({}, {}).", goblin_pos.x, goblin_pos.y);
     addEnemy(goblin_pos, std::move(goblin));
 
     // Place Health Potion
@@ -137,9 +141,15 @@ bool Map::isValidPosition(int x, int y) const {
 // --- Add/Get/Remove Entities ---
 
 void Map::addEnemy(Position position, std::unique_ptr<Enemy> enemy) {
-    if (getTile(position.x, position.y) == Tile::FLOOR) {
+    spdlog::debug("Map::addEnemy: Attempting to add enemy at ({}, {}).", position.x, position.y);
+    Tile tile_at_pos = getTile(position.x, position.y);
+    spdlog::debug("Map::addEnemy: Tile at ({}, {}) is {}.", position.x, position.y, static_cast<int>(tile_at_pos));
+    if (tile_at_pos == Tile::FLOOR) {
         enemies_[position] = std::move(enemy);
         tiles_[position.y][position.x] = Tile::ENEMY;
+        spdlog::debug("Map::addEnemy: Successfully added enemy at ({}, {}). Tile set to ENEMY.", position.x, position.y);
+    } else {
+        spdlog::warn("Map::addEnemy: Failed to add enemy at ({}, {}). Tile is not FLOOR.", position.x, position.y);
     }
 }
 
@@ -151,18 +161,24 @@ void Map::addItem(Position position, std::unique_ptr<Item> item) {
 }
 
 std::optional<std::reference_wrapper<Enemy>> Map::getEnemyAt(const Position& position) {
+    spdlog::debug("Map::getEnemyAt: Searching for enemy at ({}, {}).", position.x, position.y);
     auto it = enemies_.find(position);
     if (it != enemies_.end()) {
+        spdlog::debug("Map::getEnemyAt: Enemy found at ({}, {}): {}.", position.x, position.y, it->second->getName());
         return std::ref(*it->second);
     }
+    spdlog::debug("Map::getEnemyAt: No enemy found at ({}, {}).", position.x, position.y);
     return std::nullopt;
 }
 
 const std::optional<std::reference_wrapper<const Enemy>> Map::getEnemyAt(const Position& position) const {
+    spdlog::debug("Map::getEnemyAt (const): Searching for enemy at ({}, {}).", position.x, position.y);
     auto it = enemies_.find(position);
     if (it != enemies_.end()) {
+        spdlog::debug("Map::getEnemyAt (const): Enemy found at ({}, {}): {}.", position.x, position.y, it->second->getName());
         return std::cref(*it->second);
     }
+    spdlog::debug("Map::getEnemyAt (const): No enemy found at ({}, {}).", position.x, position.y);
     return std::nullopt;
 }
 

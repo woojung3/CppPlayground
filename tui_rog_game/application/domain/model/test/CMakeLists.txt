@@ -1,0 +1,4 @@
+add_executable(PositionTest PositionTest.cc)
+target_link_libraries(PositionTest PRIVATE gtest_main domain_model)
+include(GoogleTest)
+gtest_discover_tests(PositionTest)

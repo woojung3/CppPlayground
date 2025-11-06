@@ -11,6 +11,7 @@
 #include <vector>
 #include <memory>
 #include <optional> // For std::optional
+#include <functional> // For std::reference_wrapper
 #include "Map.h"
 
 namespace TuiRogGame {
@@ -45,7 +46,7 @@ private:
 
     std::unique_ptr<Model::Player> player_;
     std::unique_ptr<Model::Map> map_;
-    std::optional<Model::Enemy> current_enemy_; // To track the enemy in combat
+    std::optional<std::reference_wrapper<Model::Enemy>> current_enemy_; // To track the enemy in combat
 
 public: // Added public method for toggling
     void toggleDescriptionPort();

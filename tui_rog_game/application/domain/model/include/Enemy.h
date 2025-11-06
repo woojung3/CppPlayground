@@ -3,37 +3,45 @@
 #include "Stats.h"
 #include "Position.h"
 #include <string>
+#include <memory> // Required for std::unique_ptr
 
 namespace TuiRogGame {
+namespace Adapter {
+namespace Out {
+namespace Persistence {
+class EnemyRepository; // Forward declaration
+} // namespace Persistence
+} // namespace Out
+} // namespace Adapter
+
 namespace Domain {
 namespace Model {
 
 class Enemy {
+    friend class Adapter::Out::Persistence::EnemyRepository; // Grant EnemyRepository access to protected members
 public:
-    enum class EnemyType {
-        Orc,
-        Goblin
-    };
+    Enemy(std::string name, std::string type_name, Stats stats, Position position);
+    virtual ~Enemy() = default; // Virtual destructor for proper cleanup of derived classes
 
-    Enemy(EnemyType type, std::string name, Stats stats, Position position);
+    virtual std::unique_ptr<Enemy> clone() const = 0;
 
     // Getters
-    EnemyType getType() const { return type_; }
     const std::string& getName() const { return name_; }
-    int getHealth() const { return health_; }
-    int getMaxHealth() const; // Calculated from stats_.vitality
-    int getAttackPower() const; // Calculated from stats_.strength
-    const Stats& getStats() const { return stats_; }
+    virtual std::string getTypeName() const; // Made virtual
     const Position& getPosition() const { return position_; }
+    int getHealth() const; // Declared, defined in .cc
+    const Stats& getStats() const { return stats_; }
+    int getAttackPower() const; // Declared, defined in .cc
 
-    void takeDamage(int amount);
+    // Setters
+    void setPosition(const Position& pos) { position_ = pos; }
+    void takeDamage(int damage); // Declared, defined in .cc
 
-private:
-    EnemyType type_;
+protected:
     std::string name_;
-    int health_; // Current health
-    Stats stats_;
+    std::string type_name_;
     Position position_;
+    Stats stats_;
 };
 
 } // namespace Model

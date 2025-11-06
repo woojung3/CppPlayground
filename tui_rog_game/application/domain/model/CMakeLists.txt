@@ -6,6 +6,8 @@ add_library(domain_model STATIC
     src/Stats.cc
     src/Position.cc
     src/Map.cc
+    src/Orc.cc
+    src/Goblin.cc
 )
 
 # 네임스페이스 별칭을 생성합니다.

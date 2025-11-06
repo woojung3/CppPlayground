@@ -151,7 +151,7 @@ namespace TuiRogGame {
                         for (const auto& pair : enemy_ids_and_pos) {
                             auto enemy_opt = enemy_repo_.findById(base_key + ":enemies:" + pair.second); // Use full enemy ID
                             if (enemy_opt) {
-                                loaded_enemies[pair.first] = std::make_unique<Domain::Model::Enemy>(enemy_opt.value());
+                                loaded_enemies[pair.first] = std::move(enemy_opt);
                             } else {
                                 spdlog::warn("MapRepository: Enemy '{}' not found for map '{}'.", pair.second, base_key);
                             }
