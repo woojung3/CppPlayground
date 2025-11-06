@@ -94,7 +94,7 @@ void TuiAdapter::run() {
             for (int x = 0; x < current_map.getWidth(); ++x) {
               if (current_player.getPosition().x == x &&
                   current_player.getPosition().y == y) {
-                row_chars.push_back(text("@") | color(Color::Blue));
+                row_chars.push_back(text("@") | color(Color::Blue) | ftxui::blink);
               } else {
                 row_chars.push_back(TileToElement(current_map.getTile(x, y)));
               }
@@ -139,53 +139,66 @@ void TuiAdapter::run() {
 
       switch (display_tile) {
       case Domain::Model::Tile::FLOOR:
-        return vbox(
-            {text(""), text("    ╔════════════════╗"),
-             text("    ║  ░░░░░░░░░░░░  ║"), text("    ║  ░░ STONE ░░░  ║"),
-             text("    ║  ░░ FLOOR ░░░  ║"), text("    ║  ░░░░░░░░░░░░  ║"),
-             text("    ╚════════════════╝"), text("")});
+        return vbox({text(""),
+                     text("    ╔════════════════╗"),
+                     text("    ║  ░░░░░░░░░░░░  ║"),
+                     text("    ║  ░░ STONE ░░░  ║"),
+                     text("    ║  ░░ FLOOR ░░░  ║"),
+                     text("    ║  ░░░░░░░░░░░░  ║"),
+                     text("    ╚════════════════╝"),
+                     text("")});
       case Domain::Model::Tile::EXIT:
-        return vbox({text(""), text("    ╔════════════════╗"),
+        return vbox({text(""),
+                     text("    ╔════════════════╗"),
                      text("    ║    ┌──────┐    ║"),
                      text("    ║    │ ►►►► │    ║"),
                      text("    ║    │ EXIT │    ║"),
                      text("    ║    │ ►►►► │    ║"),
                      text("    ║    └──────┘    ║"),
-                     text("    ╚════════════════╝"), text("")}) |
+                     text("    ╚════════════════╝"),
+                     text("")}) |
                ftxui::color(ftxui::Color::Yellow);
       case Domain::Model::Tile::WALL:
-        return vbox({text(""), text("    ╔════════════════╗"),
+        return vbox({text(""),
+                     text("    ╔════════════════╗"),
                      text("    ║████████████████║"),
                      text("    ║█╬══╬══╬══╬═══██║"),
                      text("    ║█║  ║  ║  ║   ██║"),
                      text("    ║█╬══╬══╬══╬═══██║"),
                      text("    ║████████████████║"),
-                     text("    ╚════════════════╝"), text("")}) |
+                     text("    ╚════════════════╝"),
+                     text("")}) |
                ftxui::color(ftxui::Color::GrayDark);
       case Domain::Model::Tile::ENEMY:
-        return vbox({text(""), text("    ╔════════════════╗"),
+        return vbox({text(""),
+                     text("    ╔════════════════╗"),
                      text("    ║   ▄███████▄    ║"),
                      text("    ║  ███ ◉ ◉ ███   ║"),
                      text("    ║   ▀██▄▄▄██▀    ║"),
                      text("    ║     ▀███▀      ║"),
                      text("    ║   ⚔ ENEMY ⚔    ║"),
-                     text("    ╚════════════════╝"), text("")}) |
-               ftxui::color(ftxui::Color::Red) | ftxui::bold;
+                     text("    ╚════════════════╝"),
+                     text("")}) |
+               ftxui::color(ftxui::Color::Red) | ftxui::bold | ftxui::blink;
       case Domain::Model::Tile::ITEM:
-        return vbox({text(""), text("    ╔════════════════╗"),
+        return vbox({text(""),
+                     text("    ╔════════════════╗"),
                      text("    ║       ✦        ║"),
                      text("    ║    ╔═════╗     ║"),
                      text("    ║  ✦ ║ ◈◈◈ ║ ✦   ║"),
                      text("    ║    ╚═════╝     ║"),
                      text("    ║    ⟨ ITEM ⟩    ║"),
-                     text("    ╚════════════════╝"), text("")}) |
+                     text("    ╚════════════════╝"),
+                     text("")}) |
                ftxui::color(ftxui::Color::Green) | ftxui::bold;
       default:
-        return vbox({text(""), text("    ╔════════════════╗"),
+        return vbox({text(""),
+                     text("    ╔════════════════╗"),
                      text("    ║                ║"),
                      text("    ║   Loading...   ║"),
                      text("    ║                ║"),
-                     text("    ╚════════════════╝"), text("")});
+                     text("    ╚════════════════╝"),
+                     text("")});
       }
     };
 
