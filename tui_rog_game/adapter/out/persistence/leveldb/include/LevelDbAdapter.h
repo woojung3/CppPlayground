@@ -1,6 +1,10 @@
 #ifndef TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_LEVELDBADAPTER_H
 #define TUI_ROG_GAME_ADAPTER_OUT_PERSISTENCE_LEVELDBADAPTER_H
 
+// [Note] 이 모듈의 JSON 처리 방식은 명시적인 이해를 돕기 위해 수동 직렬화/역직렬화 방식을 사용하고 있습니다.
+// nlohmann::json 라이브러리의 `to_json` 및 `from_json` 자유 함수를 활용하면
+// 더 간결하고 효율적인 JSON 처리가 가능하며, 이는 향후 개선될 수 있는 부분입니다.
+
 #include "ISaveGameStatePort.h"
 #include "ILoadGameStatePort.h"
 #include <string>
