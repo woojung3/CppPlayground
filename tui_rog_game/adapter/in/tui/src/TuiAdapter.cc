@@ -213,6 +213,8 @@ void TuiAdapter::run() {
         text("Player Stats") | ftxui::bold, separator(),
         text("HP: " + std::to_string(player.getHp()) + "/" +
              std::to_string(player.getMaxHp())),
+        gauge((float)player.getHp() / player.getMaxHp()) |
+            color(ftxui::Color::RedLight),
         text("Level: " + std::to_string(player.getLevel())),
         text("XP: " + std::to_string(player.getXp())), separator(),
         text("Attack: " + std::to_string(player.getAttackPower())),
