@@ -139,3 +139,33 @@ target_include_directories(tui_rog_game PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/application/port/out/include
     ${CMAKE_CURRENT_SOURCE_DIR}/common/include
 )
+
+#################################
+# Generate Architecture Dependency Graph
+#################################
+find_package(Python3 REQUIRED)
+
+# Find all CMakeLists.txt files in the project
+file(GLOB_RECURSE CMAKE_FILES "**/CMakeLists.txt")
+
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/current_architecture.dot
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/extract_deps.py ${CMAKE_BINARY_DIR}/current_architecture.dot ${CMAKE_SOURCE_DIR}
+    DEPENDS ${CMAKE_FILES} ${CMAKE_SOURCE_DIR}/scripts/extract_deps.py
+    COMMENT "Generating architecture dependency graph"
+)
+
+add_custom_target(
+    generate_architecture_graph ALL
+    DEPENDS ${CMAKE_BINARY_DIR}/current_architecture.dot
+)
+
+# Define the path to the allowed architecture file
+set(ALLOWED_ARCHITECTURE_FILE "${CMAKE_SOURCE_DIR}/allowed_architecture.dot")
+
+# Add a custom target to check for architecture changes
+add_custom_target(check_architecture ALL
+    DEPENDS generate_architecture_graph # Ensure graph is generated first
+    COMMAND ${CMAKE_COMMAND} -D CURRENT_ARCH_FILE=${CMAKE_BINARY_DIR}/current_architecture.dot -D ALLOWED_ARCH_FILE=${ALLOWED_ARCHITECTURE_FILE} -P "${CMAKE_SOURCE_DIR}/scripts/check_architecture.cmake"
+    COMMENT "Verifying architecture against allowed_architecture.dot"
+)
