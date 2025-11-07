@@ -3,6 +3,7 @@
 #include "Orc.h"
 #include <algorithm>
 #include <random>
+#include <set>
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 
@@ -97,15 +98,60 @@ void Map::generate() {
     }
   }
 
+  if (!floor_positions.empty()) {
+    std::vector<Position> all_floor_tiles = floor_positions;
+    std::set<Position> visited;
+    std::vector<Position> largest_component;
+
+    for (const auto& start_pos : all_floor_tiles) {
+        if (visited.find(start_pos) == visited.end()) {
+            std::vector<Position> q;
+            q.push_back(start_pos);
+            visited.insert(start_pos);
+
+            int head = 0;
+            while(head < q.size()) {
+                Position pos = q[head++];
+
+                Position neighbors[] = {{pos.x + 1, pos.y}, {pos.x - 1, pos.y}, {pos.x, pos.y + 1}, {pos.x, pos.y - 1}};
+                for (const auto& neighbor : neighbors) {
+                    if (isValidPosition(neighbor.x, neighbor.y) && tiles_[neighbor.y][neighbor.x] == Tile::FLOOR && visited.find(neighbor) == visited.end()) {
+                         visited.insert(neighbor);
+                         q.push_back(neighbor);
+                    }
+                }
+            }
+
+            if (q.size() > largest_component.size()) {
+                largest_component = q;
+            }
+        }
+    }
+
+    std::set<Position> largest_set(largest_component.begin(), largest_component.end());
+    for(const auto& pos : all_floor_tiles){
+        if(largest_set.find(pos) == largest_set.end()){
+            tiles_[pos.y][pos.x] = Tile::WALL;
+        }
+    }
+    floor_positions = largest_component;
+  }
+
   if (floor_positions.empty()) {
     // Fallback if no floor tiles were generated (e.g., very small map or unlucky walk)
-    // Create a single floor tile in the center
+    // Create a 3x3 room in the center
     int center_x = width_ / 2;
     int center_y = height_ / 2;
-    if (isValidPosition(center_x, center_y)) {
-      tiles_[center_y][center_x] = Tile::FLOOR;
-      floor_positions.push_back({center_x, center_y});
-    } else {
+    for (int y = center_y -1; y <= center_y + 1; ++y) {
+        for (int x = center_x - 1; x <= center_x +1; ++x) {
+            if(isValidPosition(x,y)) {
+                tiles_[y][x] = Tile::FLOOR;
+                floor_positions.push_back({x,y});
+            }
+        }
+    }
+
+    if (floor_positions.empty()) {
       spdlog::error("Map is too small to generate any floor tiles.");
       return;
     }

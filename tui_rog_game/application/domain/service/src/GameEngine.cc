@@ -62,7 +62,7 @@ GameEngine::initializeGame() {
   map_->generate();
 
   player_ = std::make_unique<Model::Player>("player1", Model::Stats{},
-                                            Model::Position{1, 1});
+                                            map_->getStartPlayerPosition());
   spdlog::info("New game initialized. Player: {} at ({}, {})",
                player_->getName(), player_->getPosition().x,
                player_->getPosition().y);
