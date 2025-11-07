@@ -14,4 +14,3 @@ public:
 
 } // namespace Assembly
 } // namespace TuiRogGame
-

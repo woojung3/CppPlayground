@@ -46,9 +46,9 @@ GameEngine::initializeGame() {
 
       map_ = std::make_unique<Model::Map>(loaded_game_state->map);
       player_ = std::make_unique<Model::Player>(loaded_game_state->player);
-      events.push_back(
-          std::make_unique<Domain::Event::GameLoadedEvent>());
-      if (auto desc_event = createDescriptionEvent(Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
+      events.push_back(std::make_unique<Domain::Event::GameLoadedEvent>());
+      if (auto desc_event = createDescriptionEvent(
+              Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
         events.push_back(std::move(desc_event));
       }
 
@@ -67,10 +67,10 @@ GameEngine::initializeGame() {
                player_->getName(), player_->getPosition().x,
                player_->getPosition().y);
 
-
   events.push_back(std::make_unique<Domain::Event::PlayerMovedEvent>(
       player_->getPosition()));
-  if (auto desc_event = createDescriptionEvent(Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
+  if (auto desc_event = createDescriptionEvent(
+          Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
     events.push_back(std::move(desc_event));
   }
   return events;
@@ -130,7 +130,8 @@ void GameEngine::handlePlayerAction(
                     current_enemy_->get().getHealth(),
                     current_enemy_->get().getStats().strength,
                     current_enemy_->get().getStats().vitality));
-            if (auto desc_event = createDescriptionEvent(Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
+            if (auto desc_event = createDescriptionEvent(
+                    Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
               events.push_back(std::move(desc_event));
             }
             spdlog::info("Combat started with adjacent enemy {} at ({}, {}).",
@@ -159,7 +160,8 @@ void GameEngine::handlePlayerAction(
     events.push_back(std::make_unique<Domain::Event::PlayerAttackedEvent>(
         player_damage, current_enemy_->get().getName(),
         current_enemy_->get().getHealth()));
-    if (auto desc_event = createDescriptionEvent(Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
+    if (auto desc_event = createDescriptionEvent(
+            Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
       events.push_back(std::move(desc_event));
     }
     spdlog::info("Player attacked {} for {} damage. {}'s health: {}",
@@ -175,7 +177,8 @@ void GameEngine::handlePlayerAction(
       bool leveled_up = player_->gainXp(xp_gained);
       events.push_back(std::make_unique<Domain::Event::EnemyDefeatedEvent>(
           current_enemy_->get().getName(), xp_gained));
-      if (auto desc_event = createDescriptionEvent(Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
+      if (auto desc_event = createDescriptionEvent(
+              Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
         events.push_back(std::move(desc_event));
       }
       spdlog::info("{} defeated! Player gained {} XP.",
@@ -184,7 +187,8 @@ void GameEngine::handlePlayerAction(
       if (leveled_up) {
         events.push_back(std::make_unique<Domain::Event::PlayerLeveledUpEvent>(
             player_->getLevel(), player_->getStats()));
-        if (auto desc_event = createDescriptionEvent(Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
+        if (auto desc_event = createDescriptionEvent(
+                Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
           events.push_back(std::move(desc_event));
         }
         spdlog::info("Player leveled up to level {}!", player_->getLevel());
@@ -202,7 +206,8 @@ void GameEngine::handlePlayerAction(
       player_->takeDamage(enemy_damage);
       events.push_back(std::make_unique<Domain::Event::EnemyAttackedEvent>(
           current_enemy_->get().getName(), enemy_damage, player_->getHp()));
-      if (auto desc_event = createDescriptionEvent(Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
+      if (auto desc_event = createDescriptionEvent(
+              Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
         events.push_back(std::move(desc_event));
       }
       spdlog::info("{} attacked player for {} damage. Player's health: {}",
@@ -210,15 +215,17 @@ void GameEngine::handlePlayerAction(
                    player_->getHp());
 
       if (player_->getHp() <= 0) {
-        spdlog::debug("GameEngine: Player defeated.");
+        spdlog::debug("GameEngine: Player defeated, but will be resurrected.");
 
         events.push_back(std::make_unique<Domain::Event::PlayerDiedEvent>());
-        if (auto desc_event = createDescriptionEvent(Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
+        player_->setHp(player_->getMaxHp());
+
+        if (auto desc_event = createDescriptionEvent(
+                Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
           events.push_back(std::move(desc_event));
         }
 
-        spdlog::info("Player defeated!");
-
+        spdlog::info("Player defeated, but resurrected!");
       }
     }
     break;
@@ -234,7 +241,8 @@ void GameEngine::handlePlayerAction(
       if (player_->useItem(item_name)) {
         events.push_back(
             std::make_unique<Domain::Event::ItemUsedEvent>(item_name));
-        if (auto desc_event = createDescriptionEvent(Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
+        if (auto desc_event = createDescriptionEvent(
+                Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
           events.push_back(std::move(desc_event));
         }
         spdlog::info("Player used item: {}", item_name);
@@ -242,7 +250,6 @@ void GameEngine::handlePlayerAction(
         spdlog::warn("Player tried to use item '{}' but it was not found or "
                      "could not be used.",
                      item_name);
-
       }
     } else {
       spdlog::error("USE_ITEM command received without a string payload.");
@@ -291,7 +298,8 @@ GameEngine::processPlayerMove(int dx, int dy) {
   events.push_back(std::make_unique<Domain::Event::PlayerMovedEvent>(new_pos));
   spdlog::info("GameEngine: PlayerMovedEvent created.");
 
-  if (auto desc_event = createDescriptionEvent(Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
+  if (auto desc_event = createDescriptionEvent(
+          Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
     events.push_back(std::move(desc_event));
   }
 
@@ -301,11 +309,12 @@ GameEngine::processPlayerMove(int dx, int dy) {
                   "current_enemy_.",
                   new_pos.x, new_pos.y, current_enemy_->get().getName());
     events.push_back(std::make_unique<Domain::Event::CombatStartedEvent>(
-        current_enemy_->get().getTypeName(),
-        current_enemy_->get().getName(), current_enemy_->get().getHealth(),
+        current_enemy_->get().getTypeName(), current_enemy_->get().getName(),
+        current_enemy_->get().getHealth(),
         current_enemy_->get().getStats().strength,
         current_enemy_->get().getStats().vitality));
-    if (auto desc_event = createDescriptionEvent(Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
+    if (auto desc_event = createDescriptionEvent(
+            Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
       events.push_back(std::move(desc_event));
     }
     spdlog::info(
@@ -317,8 +326,10 @@ GameEngine::processPlayerMove(int dx, int dy) {
     if (item_unique_ptr) {
       events.push_back(std::make_unique<Domain::Event::ItemFoundEvent>(
           static_cast<Domain::Event::ItemFoundEvent::ItemType>(
-              item_unique_ptr->getType()), item_unique_ptr->getName(), ""));
-      if (auto desc_event = createDescriptionEvent(Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
+              item_unique_ptr->getType()),
+          item_unique_ptr->getName(), ""));
+      if (auto desc_event = createDescriptionEvent(
+              Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
         events.push_back(std::move(desc_event));
       }
       player_->addItem(
@@ -333,7 +344,8 @@ GameEngine::processPlayerMove(int dx, int dy) {
     player_->moveTo(map_->getStartPlayerPosition());
 
     events.push_back(std::make_unique<Domain::Event::MapChangedEvent>());
-    if (auto desc_event = createDescriptionEvent(Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
+    if (auto desc_event = createDescriptionEvent(
+            Port::Out::GameStateDTO(*map_, *player_), *events.back())) {
       events.push_back(std::move(desc_event));
     }
     events.push_back(std::make_unique<Domain::Event::PlayerMovedEvent>(
@@ -360,7 +372,6 @@ void GameEngine::processEvents(
   } else {
     for (const auto &event : events) {
       spdlog::info("GameEngine: Processing event: {}", event->toString());
-
     }
   }
 
@@ -373,7 +384,9 @@ void GameEngine::toggleDescriptionPort() {
                use_alternative_description_port_ ? "alternative" : "primary");
 }
 
-std::unique_ptr<TuiRogGame::Domain::Event::DescriptionGeneratedEvent> GameEngine::createDescriptionEvent(const Port::Out::GameStateDTO& game_state, const Domain::Event::DomainEvent& event) {
+std::unique_ptr<TuiRogGame::Domain::Event::DescriptionGeneratedEvent>
+GameEngine::createDescriptionEvent(const Port::Out::GameStateDTO &game_state,
+                                   const Domain::Event::DomainEvent &event) {
   Port::Out::IGenerateDescriptionPort *active_description_port = nullptr;
   if (use_alternative_description_port_ && alternative_description_port_) {
     active_description_port = alternative_description_port_.get();
@@ -382,9 +395,11 @@ std::unique_ptr<TuiRogGame::Domain::Event::DescriptionGeneratedEvent> GameEngine
   }
 
   if (active_description_port) {
-    std::string generated_description = active_description_port->generateDescription(game_state, event);
+    std::string generated_description =
+        active_description_port->generateDescription(game_state, event);
     if (!generated_description.empty()) {
-      return std::make_unique<Domain::Event::DescriptionGeneratedEvent>(generated_description);
+      return std::make_unique<Domain::Event::DescriptionGeneratedEvent>(
+          generated_description);
     }
   }
   return nullptr;

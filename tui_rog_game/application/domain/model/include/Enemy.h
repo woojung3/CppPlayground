@@ -19,6 +19,7 @@ namespace Model {
 
 class Enemy {
   friend class Adapter::Out::Persistence::EnemyRepository;
+
 public:
   Enemy(std::string name, std::string type_name, Stats stats,
         Position position);

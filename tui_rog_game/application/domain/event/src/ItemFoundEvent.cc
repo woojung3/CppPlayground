@@ -23,8 +23,6 @@ static_assert(
             TuiRogGame::Domain::Model::Item::ItemType::StrengthScroll),
     "ItemFoundEvent::ItemType::StrengthScroll value mismatch");
 
-
-
 ItemFoundEvent::ItemFoundEvent(ItemType item_type, const std::string &item_name,
                                const std::string &item_description)
     : DomainEvent(Type::ItemFound), item_type_(item_type),

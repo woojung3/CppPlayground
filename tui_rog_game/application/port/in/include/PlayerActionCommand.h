@@ -10,9 +10,6 @@ namespace TuiRogGame {
 namespace Port {
 namespace In {
 
-
-
-
 struct PlayerActionCommand {
   enum ActionType {
     INITIALIZE,
@@ -28,10 +25,6 @@ struct PlayerActionCommand {
   };
 
   ActionType type;
-
-
-
-
 
   std::variant<std::monostate, int, TuiRogGame::Domain::Model::Position,
                std::string>
@@ -58,7 +51,6 @@ struct PlayerActionCommand {
     validate();
   }
 
-
 private:
   void validate() const {
     switch (type) {
@@ -73,14 +65,9 @@ private:
     case MOVE_LEFT:
     case MOVE_RIGHT:
 
-
-
       break;
     case INTERACT:
       if (!std::holds_alternative<std::string>(payload)) {
-
-
-
       }
       break;
     case USE_ITEM:
@@ -100,4 +87,3 @@ private:
 } // namespace In
 } // namespace Port
 } // namespace TuiRogGame
-

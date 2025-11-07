@@ -10,7 +10,6 @@ namespace Event {
 
 class ItemFoundEvent : public DomainEvent {
 public:
-
   enum class ItemType { HealthPotion, StrengthScroll };
 
   explicit ItemFoundEvent(ItemType item_type, const std::string &item_name,

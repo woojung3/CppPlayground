@@ -56,23 +56,20 @@ void TuiAdapter::run() {
   using namespace ftxui;
 
   auto renderer = Renderer([&] {
-
     if (show_start_screen_) {
-      auto title = ftxui::text("TUI-ROG: Dungeon Master") | ftxui::bold |
-                   ftxui::center;
+      auto title =
+          ftxui::text("TUI-ROG: Dungeon Master") | ftxui::bold | ftxui::center;
       auto instructions =
-          ftxui::vbox({ftxui::text(""), ftxui::text("Controls:"),
-                       ftxui::text("  W: Move Up"),
-                       ftxui::text("  S: Move Down"),
-                       ftxui::text("  A: Move Left"),
-                       ftxui::text("  D: Move Right"),
-                       ftxui::text("  X: Attack (if enemy present)"),
-                       ftxui::text("  U: Use Item (requires item name)"),
-                       ftxui::text("  M: Toggle Description Model "
-                                   "(Hardcoded/AI)"),
-                       ftxui::text("  Q: Quit"), ftxui::text(""),
-                       ftxui::text("Press any key to start...") |
-                           ftxui::center}) |
+          ftxui::vbox(
+              {ftxui::text(""), ftxui::text("Controls:"),
+               ftxui::text("  W: Move Up"), ftxui::text("  S: Move Down"),
+               ftxui::text("  A: Move Left"), ftxui::text("  D: Move Right"),
+               ftxui::text("  X: Attack (if enemy present)"),
+               ftxui::text("  U: Use Item (requires item name)"),
+               ftxui::text("  M: Toggle Description Model "
+                           "(Hardcoded/AI)"),
+               ftxui::text("  Q: Quit"), ftxui::text(""),
+               ftxui::text("Press any key to start...") | ftxui::center}) |
           ftxui::border;
       return ftxui::vbox({title, instructions}) | ftxui::center | ftxui::flex;
     }
@@ -94,7 +91,8 @@ void TuiAdapter::run() {
             for (int x = 0; x < current_map.getWidth(); ++x) {
               if (current_player.getPosition().x == x &&
                   current_player.getPosition().y == y) {
-                row_chars.push_back(text("@") | color(Color::Blue) | ftxui::blink);
+                row_chars.push_back(text("@") | color(Color::Blue) |
+                                    ftxui::blink);
               } else {
                 row_chars.push_back(TileToElement(current_map.getTile(x, y)));
               }
@@ -139,8 +137,8 @@ void TuiAdapter::run() {
 
       switch (display_tile) {
       case Domain::Model::Tile::FLOOR:
-        return vbox({text(""),
-                     text("    ╔════════════════╗"),
+        return vbox({text(""), 
+                     text("    ╔════════════════╗"), 
                      text("    ║  ░░░░░░░░░░░░  ║"),
                      text("    ║  ░░ STONE ░░░  ║"),
                      text("    ║  ░░ FLOOR ░░░  ║"),
@@ -192,7 +190,7 @@ void TuiAdapter::run() {
                      text("")}) |
                ftxui::color(ftxui::Color::Green) | ftxui::bold;
       default:
-        return vbox({text(""),
+        return vbox({text(""), 
                      text("    ╔════════════════╗"),
                      text("    ║                ║"),
                      text("    ║   Loading...   ║"),
@@ -309,7 +307,6 @@ void TuiAdapter::run() {
         break; // New control for attack
       case 'u':
 
-
         command = Port::In::PlayerActionCommand(
             Port::In::PlayerActionCommand::USE_ITEM, "Health Potion");
         break;
@@ -423,7 +420,6 @@ void TuiAdapter::render(
       }
     }
     state_changed = true; // 이벤트가 있으면 무조건 업데이트
-
   }
 
   if (state_changed) {

@@ -19,9 +19,7 @@ Player::Player(PlayerId id, PlayerCoreStats core_stats, Stats stats,
                Position position, std::vector<std::unique_ptr<Item>> inventory)
     : id_(std::move(id)), level_(core_stats.level), xp_(core_stats.xp),
       hp_(core_stats.hp), stats_(stats), position_(position),
-      inventory_(std::move(inventory)) {
-
-}
+      inventory_(std::move(inventory)) {}
 
 Player::Player(const Player &other)
     : id_(other.id_), level_(other.level_), xp_(other.xp_), hp_(other.hp_),
@@ -33,10 +31,7 @@ Player::Player(const Player &other)
 
 int Player::getMaxHp() const { return calculateMaxHp(stats_); }
 
-int Player::getAttackPower() const {
-
-  return 5 + (stats_.strength * 2);
-}
+int Player::getAttackPower() const { return 5 + (stats_.strength * 2); }
 
 void Player::moveTo(Position new_position) { position_ = new_position; }
 
@@ -79,7 +74,6 @@ bool Player::useItem(const std::string &item_name) {
       if ((*it)->getType() == Item::ItemType::HealthPotion) {
         hp_ = std::min(hp_ + 20, getMaxHp());
       }
-
 
       inventory_.erase(it);
       return true;

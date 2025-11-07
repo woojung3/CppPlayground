@@ -46,7 +46,9 @@ public:
 class MockGenerateDescriptionPort : public IGenerateDescriptionPort {
 public:
   MOCK_METHOD(std::string, generateDescription,
-              (const GameStateDTO &game_state, const TuiRogGame::Domain::Event::DomainEvent& event), (override));
+              (const GameStateDTO &game_state,
+               const TuiRogGame::Domain::Event::DomainEvent &event),
+              (override));
 };
 
 class GameEngineTest : public ::testing::Test {
@@ -86,15 +88,11 @@ TEST_F(GameEngineTest, InitializeNewGame) {
   EXPECT_CALL(*mock_load_port_, loadGameState())
       .WillOnce(Return(nullptr)); // Return nullptr for no saved game
 
-
   EXPECT_CALL(mock_render_port_, render(_, _));
   EXPECT_CALL(*mock_save_port_, saveGameState(_));
 
   PlayerActionCommand command(PlayerActionCommand::INITIALIZE);
   game_engine_->handlePlayerAction(command);
-
-
-
 }
 
 TEST_F(GameEngineTest, PlayerMoves) {
@@ -109,8 +107,11 @@ TEST_F(GameEngineTest, PlayerMoves) {
 
   EXPECT_CALL(*primary_desc_port_ptr_, generateDescription(_, _))
       .Times(2) // Expect two calls: GameLoaded, PlayerMoved (action)
-      .WillOnce(Return("게임이 로드되었습니다. 당신은 던전 깊은 곳에 서 있습니다. 평범한 던전 복도입니다. 특별한 것은 보이지 않습니다. "))
-      .WillOnce(Return("새로운 지역으로 이동했습니다. 평범한 던전 복도입니다. 특별한 것은 보이지 않습니다. "));
+      .WillOnce(
+          Return("게임이 로드되었습니다. 당신은 던전 깊은 곳에 서 있습니다. "
+                 "평범한 던전 복도입니다. 특별한 것은 보이지 않습니다. "))
+      .WillOnce(Return("새로운 지역으로 이동했습니다. 평범한 던전 복도입니다. "
+                       "특별한 것은 보이지 않습니다. "));
 
   EXPECT_CALL(mock_render_port_, render(_, _))
       .Times(2); // Initialize and then move
@@ -122,8 +123,6 @@ TEST_F(GameEngineTest, PlayerMoves) {
 
   PlayerActionCommand moveCommand(PlayerActionCommand::MOVE_DOWN);
   game_engine_->handlePlayerAction(moveCommand);
-
-
 }
 
 TEST_F(GameEngineTest, ComplexScenario) {
@@ -151,7 +150,6 @@ TEST_F(GameEngineTest, ComplexScenario) {
   auto initialGameState =
       std::make_unique<GameStateDTO>(initialMap, initialPlayer);
 
-
   EXPECT_CALL(*mock_load_port_, loadGameState())
       .WillOnce(Return(std::move(initialGameState)));
 
@@ -166,7 +164,6 @@ TEST_F(GameEngineTest, ComplexScenario) {
   EXPECT_CALL(*mock_save_port_, saveGameState(_))
       .Times(::testing::AtLeast(1)); // At least one save call per action
 
-
   PlayerActionCommand initCommand(PlayerActionCommand::INITIALIZE);
   game_engine_->handlePlayerAction(initCommand);
 
@@ -175,7 +172,6 @@ TEST_F(GameEngineTest, ComplexScenario) {
 
   PlayerActionCommand moveDown2(PlayerActionCommand::MOVE_DOWN);
   game_engine_->handlePlayerAction(moveDown2);
-
 
   for (int i = 0; i < 10; ++i) { // Simulate 10 attacks
     PlayerActionCommand attackCommand(PlayerActionCommand::ATTACK,
@@ -187,7 +183,4 @@ TEST_F(GameEngineTest, ComplexScenario) {
   game_engine_->handlePlayerAction(moveDown3);
   PlayerActionCommand moveDown4(PlayerActionCommand::MOVE_DOWN);
   game_engine_->handlePlayerAction(moveDown4);
-
-
-
 }

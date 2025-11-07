@@ -1,15 +1,15 @@
 #pragma once
 
-#include <memory>
-#include <nlohmann/json.hpp>
-#include <optional>
-#include <string>
 #include "ItemRepository.h"
 #include "Player.h"
 #include "PlayerCoreStats.h"
 #include "Position.h"
 #include "StandardLayoutCrudRepository.h"
 #include "Stats.h"
+#include <memory>
+#include <nlohmann/json.hpp>
+#include <optional>
+#include <string>
 
 namespace TuiRogGame {
 namespace Adapter {
@@ -34,7 +34,6 @@ private:
   StandardLayoutCrudRepository<Domain::Model::Position> player_position_crud_;
 
   std::string toLower(std::string s) const;
-
 
   nlohmann::json
   serializePlayerNonStandard(const Domain::Model::Player &player) const;

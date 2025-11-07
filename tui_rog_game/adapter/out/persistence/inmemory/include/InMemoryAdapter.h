@@ -28,4 +28,3 @@ private:
 } // namespace Out
 } // namespace Adapter
 } // namespace TuiRogGame
-

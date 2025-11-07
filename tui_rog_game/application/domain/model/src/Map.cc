@@ -28,7 +28,6 @@ Map::Map(int width, int height, Position start_player_position,
   if (width_ <= 0 || height_ <= 0) {
     throw std::invalid_argument("Map dimensions must be positive.");
   }
-
 }
 
 Map::Map(const Map &other)
@@ -54,13 +53,15 @@ void Map::generate() {
   }
 
   // Random walk parameters
-  int max_walk_length = width_ * height_ * 2; // Walk for a length proportional to map size
+  int max_walk_length =
+      width_ * height_ * 2; // Walk for a length proportional to map size
   int current_x = width_ / 2;
   int current_y = height_ / 2;
 
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<> distrib(0, 3); // 0: up, 1: down, 2: left, 3: right
+  std::uniform_int_distribution<> distrib(
+      0, 3); // 0: up, 1: down, 2: left, 3: right
 
   for (int i = 0; i < max_walk_length; ++i) {
     if (isValidPosition(current_x, current_y)) {
@@ -103,52 +104,58 @@ void Map::generate() {
     std::set<Position> visited;
     std::vector<Position> largest_component;
 
-    for (const auto& start_pos : all_floor_tiles) {
-        if (visited.find(start_pos) == visited.end()) {
-            std::vector<Position> q;
-            q.push_back(start_pos);
-            visited.insert(start_pos);
+    for (const auto &start_pos : all_floor_tiles) {
+      if (visited.find(start_pos) == visited.end()) {
+        std::vector<Position> q;
+        q.push_back(start_pos);
+        visited.insert(start_pos);
 
-            int head = 0;
-            while(head < q.size()) {
-                Position pos = q[head++];
+        int head = 0;
+        while (head < q.size()) {
+          Position pos = q[head++];
 
-                Position neighbors[] = {{pos.x + 1, pos.y}, {pos.x - 1, pos.y}, {pos.x, pos.y + 1}, {pos.x, pos.y - 1}};
-                for (const auto& neighbor : neighbors) {
-                    if (isValidPosition(neighbor.x, neighbor.y) && tiles_[neighbor.y][neighbor.x] == Tile::FLOOR && visited.find(neighbor) == visited.end()) {
-                         visited.insert(neighbor);
-                         q.push_back(neighbor);
-                    }
-                }
+          Position neighbors[] = {{pos.x + 1, pos.y},
+                                  {pos.x - 1, pos.y},
+                                  {pos.x, pos.y + 1},
+                                  {pos.x, pos.y - 1}};
+          for (const auto &neighbor : neighbors) {
+            if (isValidPosition(neighbor.x, neighbor.y) &&
+                tiles_[neighbor.y][neighbor.x] == Tile::FLOOR &&
+                visited.find(neighbor) == visited.end()) {
+              visited.insert(neighbor);
+              q.push_back(neighbor);
             }
-
-            if (q.size() > largest_component.size()) {
-                largest_component = q;
-            }
+          }
         }
+
+        if (q.size() > largest_component.size()) {
+          largest_component = q;
+        }
+      }
     }
 
-    std::set<Position> largest_set(largest_component.begin(), largest_component.end());
-    for(const auto& pos : all_floor_tiles){
-        if(largest_set.find(pos) == largest_set.end()){
-            tiles_[pos.y][pos.x] = Tile::WALL;
-        }
+    std::set<Position> largest_set(largest_component.begin(),
+                                   largest_component.end());
+    for (const auto &pos : all_floor_tiles) {
+      if (largest_set.find(pos) == largest_set.end()) {
+        tiles_[pos.y][pos.x] = Tile::WALL;
+      }
     }
     floor_positions = largest_component;
   }
 
   if (floor_positions.empty()) {
-    // Fallback if no floor tiles were generated (e.g., very small map or unlucky walk)
-    // Create a 3x3 room in the center
+    // Fallback if no floor tiles were generated (e.g., very small map or
+    // unlucky walk) Create a 3x3 room in the center
     int center_x = width_ / 2;
     int center_y = height_ / 2;
-    for (int y = center_y -1; y <= center_y + 1; ++y) {
-        for (int x = center_x - 1; x <= center_x +1; ++x) {
-            if(isValidPosition(x,y)) {
-                tiles_[y][x] = Tile::FLOOR;
-                floor_positions.push_back({x,y});
-            }
+    for (int y = center_y - 1; y <= center_y + 1; ++y) {
+      for (int x = center_x - 1; x <= center_x + 1; ++x) {
+        if (isValidPosition(x, y)) {
+          tiles_[y][x] = Tile::FLOOR;
+          floor_positions.push_back({x, y});
         }
+      }
     }
 
     if (floor_positions.empty()) {
@@ -162,8 +169,8 @@ void Map::generate() {
 
   // Place player, enemies, items, and exit
   if (floor_positions.size() < 2) {
-    spdlog::warn(
-        "Not enough floor tiles for both player and exit. They might share a position.");
+    spdlog::warn("Not enough floor tiles for both player and exit. They might "
+                 "share a position.");
   }
 
   // Ensure player start position is set
@@ -178,7 +185,8 @@ void Map::generate() {
   } else {
     // If only one floor tile, player and exit share it
     tiles_[start_player_position_.y][start_player_position_.x] = Tile::EXIT;
-    spdlog::warn("Only one floor tile generated. Player and Exit share the same position.");
+    spdlog::warn("Only one floor tile generated. Player and Exit share the "
+                 "same position.");
   }
 
   // Place enemies and items if there are remaining floor positions
@@ -223,7 +231,6 @@ bool Map::isWalkable(int x, int y) const {
 bool Map::isValidPosition(int x, int y) const {
   return x >= 0 && x < width_ && y >= 0 && y < height_;
 }
-
 
 void Map::addEnemy(Position position, std::unique_ptr<Enemy> enemy) {
   spdlog::debug("Map::addEnemy: Attempting to add enemy at ({}, {}).",

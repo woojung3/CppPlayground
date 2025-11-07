@@ -9,7 +9,6 @@ namespace Event {
 
 class DomainEvent {
 public:
-
   enum class Type {
     PlayerMoved,
     ItemFound,
@@ -29,9 +28,7 @@ public:
 
   virtual ~DomainEvent() = default;
   Type getType() const { return type_; }
-  virtual std::string
-  toString() const = 0;
-
+  virtual std::string toString() const = 0;
 
 protected:
   DomainEvent(Type type) : type_(type) {}

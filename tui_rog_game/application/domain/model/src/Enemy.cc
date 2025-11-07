@@ -13,9 +13,7 @@ std::string Enemy::getTypeName() const { return type_name_; }
 
 int Enemy::getHealth() const { return stats_.health; }
 
-int Enemy::getAttackPower() const {
-  return stats_.strength;
-}
+int Enemy::getAttackPower() const { return stats_.strength; }
 
 void Enemy::takeDamage(int damage) {
   stats_.health -= damage;

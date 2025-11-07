@@ -18,4 +18,3 @@ public:
 } // namespace Out
 } // namespace Port
 } // namespace TuiRogGame
-

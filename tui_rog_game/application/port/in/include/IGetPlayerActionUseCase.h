@@ -6,14 +6,9 @@ namespace TuiRogGame {
 namespace Port {
 namespace In {
 
-
-
-
 class IGetPlayerActionUseCase {
 public:
   virtual ~IGetPlayerActionUseCase() = default;
-
-
 
   virtual void handlePlayerAction(
       const TuiRogGame::Port::In::PlayerActionCommand &command) = 0;
@@ -24,4 +19,3 @@ public:
 } // namespace In
 } // namespace Port
 } // namespace TuiRogGame
-

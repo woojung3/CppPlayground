@@ -61,8 +61,7 @@ TEST(MapTest, EnemyManagement) {
   Map map(10, 10);
   map.generate();
 
-  Position newEnemyPos = {1,
-                          1};
+  Position newEnemyPos = {1, 1};
 
   ASSERT_EQ(map.getTile(newEnemyPos.x, newEnemyPos.y), Tile::FLOOR);
 

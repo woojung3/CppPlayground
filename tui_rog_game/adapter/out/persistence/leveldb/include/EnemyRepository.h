@@ -1,12 +1,12 @@
 #pragma once
-#include <memory>
-#include <nlohmann/json.hpp>
-#include <string>
 #include "Enemy.h"
 #include "Goblin.h"
 #include "Orc.h"
 #include "Position.h"
 #include "Stats.h"
+#include <memory>
+#include <nlohmann/json.hpp>
+#include <string>
 
 namespace TuiRogGame {
 namespace Adapter {
@@ -22,7 +22,6 @@ public:
   void deleteById(const std::string &key);
 
 private:
-
   std::string toLower(std::string s) const;
 
   nlohmann::json serializeEnemy(const Domain::Model::Enemy &enemy) const;

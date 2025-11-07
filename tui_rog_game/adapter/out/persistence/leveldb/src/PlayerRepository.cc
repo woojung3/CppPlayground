@@ -26,7 +26,6 @@ nlohmann::json PlayerRepository::serializePlayerNonStandard(
   nlohmann::json inventory_ids_json = nlohmann::json::array();
   for (const auto &item_ptr : player.getInventory()) {
 
-
     inventory_ids_json.push_back(
         item_ptr->getName()); // Placeholder for item ID
   }
@@ -163,9 +162,6 @@ void PlayerRepository::deleteById(const std::string &key) {
   player_position_crud_.deleteById(base_key + ":position");
 
   provider.Delete(base_key + ":non_standard");
-
-
-
 
   spdlog::warn("PlayerRepository: Inventory items for player '{}' are not "
                "deleted during player deletion. Manual cleanup needed.",

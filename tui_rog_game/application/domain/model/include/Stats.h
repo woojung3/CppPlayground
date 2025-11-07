@@ -21,7 +21,6 @@ struct Stats {
   }
 };
 
-
 static_assert(std::is_standard_layout<Stats>::value,
               "Stats must be a standard layout type for serialization.");
 

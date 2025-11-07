@@ -22,7 +22,6 @@ struct Position {
   }
 };
 
-
 static_assert(std::is_standard_layout<Position>::value,
               "Position must be a standard layout type for serialization.");
 

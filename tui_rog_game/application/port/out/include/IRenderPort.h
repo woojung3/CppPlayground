@@ -9,12 +9,9 @@ namespace TuiRogGame {
 namespace Port {
 namespace Out {
 
-
-
 class IRenderPort {
 public:
   virtual ~IRenderPort() = default;
-
 
   virtual void
   render(const GameStateDTO &game_state,
@@ -25,4 +22,3 @@ public:
 } // namespace Out
 } // namespace Port
 } // namespace TuiRogGame
-

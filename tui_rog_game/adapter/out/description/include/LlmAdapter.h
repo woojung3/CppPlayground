@@ -18,7 +18,8 @@ public:
   LlmAdapter();
   ~LlmAdapter() override;
   std::string
-  generateDescription(const Port::Out::GameStateDTO &game_state, const Domain::Event::DomainEvent& event) override;
+  generateDescription(const Port::Out::GameStateDTO &game_state,
+                      const Domain::Event::DomainEvent &event) override;
 
 private:
   struct Impl;

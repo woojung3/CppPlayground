@@ -69,7 +69,6 @@ Port::Out::GameStateDTO createDummyGameState() {
   std::map<Domain::Model::Position, std::unique_ptr<Domain::Model::Enemy>>
       enemies;
 
-
   enemies.emplace(
       Domain::Model::Position{1, 1},
       std::make_unique<Domain::Model::Goblin>(Domain::Model::Position{1, 1}));
@@ -112,7 +111,6 @@ protected:
   std::unique_ptr<Port::Out::GameStateDTO> dummy_game_state_;
 };
 
-
 BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_SaveGame_Direct)
 (benchmark::State &state) {
   for (auto _ : state) {
@@ -135,7 +133,6 @@ BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_LoadGame_Direct)
 
   addCounters(state, state.iterations());
 }
-
 
 BENCHMARK_F(LevelDbAdapterFixture, BM_LevelDbAdapter_SaveGame_Port)
 (benchmark::State &state) {

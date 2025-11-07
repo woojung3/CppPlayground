@@ -1,8 +1,8 @@
 #include "LlmAdapter.h"
+#include "DomainEvent.h"
 #include "GameStateDTO.h"
 #include "Map.h"
 #include "Player.h"
-#include "DomainEvent.h"
 #include "PlayerMovedEvent.h"
 #include "gtest/gtest.h"
 #include <cstdlib>
@@ -17,8 +17,6 @@ protected:
 
     if (std::getenv("GROQ_API_KEY") == nullptr) {
       spdlog::warn("GROQ_API_KEY not set. Gemini API tests might fail.");
-
-
     }
   }
 };
@@ -33,14 +31,14 @@ TEST_F(LlmAdapterTest, GeneratesNonEmptyDescription) {
   TuiRogGame::Port::Out::GameStateDTO dummy_game_state(dummy_map, dummy_player);
 
   // Create a dummy event
-  TuiRogGame::Domain::Event::PlayerMovedEvent dummy_event(dummy_player.getPosition());
+  TuiRogGame::Domain::Event::PlayerMovedEvent dummy_event(
+      dummy_player.getPosition());
 
-  std::string description = adapter.generateDescription(dummy_game_state, dummy_event);
+  std::string description =
+      adapter.generateDescription(dummy_game_state, dummy_event);
   spdlog::info("Generated Description: {}", description);
 
   ASSERT_FALSE(description.empty());
-
-
 
   ASSERT_EQ(description.find("(API Key Missing)"), std::string::npos)
       << "Description indicates API Key Missing, but it should not if key is "

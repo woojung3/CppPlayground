@@ -1,7 +1,6 @@
 #include "MapChangedEvent.h"
 #include <string>
 
-
 namespace TuiRogGame {
 namespace Domain {
 namespace Event {

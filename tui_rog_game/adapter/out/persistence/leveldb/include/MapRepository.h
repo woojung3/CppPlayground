@@ -1,15 +1,15 @@
 #pragma once
 
-#include <memory>
-#include <nlohmann/json.hpp>
-#include <optional>
-#include <string>
 #include "EnemyRepository.h"
 #include "ItemRepository.h"
 #include "Map.h"
 #include "MapDimensions.h"
 #include "Position.h"
 #include "StandardLayoutCrudRepository.h"
+#include <memory>
+#include <nlohmann/json.hpp>
+#include <optional>
+#include <string>
 
 namespace TuiRogGame {
 namespace Adapter {

@@ -17,7 +17,6 @@ std::unique_ptr<TuiRogGame::Port::Out::GameStateDTO>
 InMemoryAdapter::loadGameState() {
   if (stored_game_state_) {
 
-
     spdlog::info("[InMemoryAdapter] Game loaded.");
     return std::make_unique<TuiRogGame::Port::Out::GameStateDTO>(
         *stored_game_state_);

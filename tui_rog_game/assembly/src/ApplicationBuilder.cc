@@ -1,8 +1,5 @@
 #include "ApplicationBuilder.h"
 
-#include <memory>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/spdlog.h>
 #include "GameEngine.h"
 #include "HardcodedDescAdapter.h"
 #include "ILoadGameStatePort.h"
@@ -12,6 +9,9 @@
 #include "LlmAdapter.h"
 #include "TuiAdapter.h"
 #include "ftxui/component/screen_interactive.hpp"
+#include <memory>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/spdlog.h>
 
 namespace TuiRogGame {
 namespace Assembly {
@@ -22,8 +22,8 @@ TuiRogGame::Assembly::ApplicationBuilder::build(
   auto persistence_adapter =
       std::make_shared<Adapter::Out::Persistence::LevelDbAdapter>(
           "./game_data.db");
-//  auto persistence_adapter =
-//      std::make_shared<Adapter::Out::Persistence::InMemoryAdapter>();
+  //  auto persistence_adapter =
+  //      std::make_shared<Adapter::Out::Persistence::InMemoryAdapter>();
 
   auto hardcoded_desc_adapter =
       std::make_unique<Adapter::Out::Description::HardcodedDescAdapter>();

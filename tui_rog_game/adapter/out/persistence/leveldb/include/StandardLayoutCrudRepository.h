@@ -96,11 +96,9 @@ public:
   }
 
 private:
-
 };
 
 } // namespace Persistence
 } // namespace Out
 } // namespace Adapter
 } // namespace TuiRogGame
-

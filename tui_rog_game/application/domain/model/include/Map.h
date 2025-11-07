@@ -27,16 +27,13 @@ public:
   Map(const Map &other);
 
   void generate();
-  Position getStartPlayerPosition() const {
-    return start_player_position_;
-  }
+  Position getStartPlayerPosition() const { return start_player_position_; }
 
   int getWidth() const { return width_; }
   int getHeight() const { return height_; }
   Tile getTile(int x, int y) const;
   bool isWalkable(int x, int y) const;
   bool isValidPosition(int x, int y) const;
-
 
   const std::vector<std::vector<Tile>> &getTiles() const { return tiles_; }
   const std::map<Position, std::unique_ptr<Enemy>> &getEnemies() const {
@@ -49,12 +46,8 @@ public:
   void setTiles(std::vector<std::vector<Tile>> tiles) {
     tiles_ = std::move(tiles);
   }
-  void addEnemy(
-      Position position,
-      std::unique_ptr<Enemy> enemy);
-  void addItem(
-      Position position,
-      std::unique_ptr<Item> item);
+  void addEnemy(Position position, std::unique_ptr<Enemy> enemy);
+  void addItem(Position position, std::unique_ptr<Item> item);
   void setStartPlayerPosition(Position pos) { start_player_position_ = pos; }
   void setTile(int x, int y, Tile tile);
 

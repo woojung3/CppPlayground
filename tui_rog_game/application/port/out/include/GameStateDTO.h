@@ -13,8 +13,6 @@ struct GameStateDTO {
 
   GameStateDTO(Domain::Model::Map map_val, Domain::Model::Player player_val)
       : map(std::move(map_val)), player(std::move(player_val)) {}
-
-
 };
 
 } // namespace Out

@@ -1,14 +1,14 @@
 #pragma once
 
-#include "DomainEvent.h"
 #include "DescriptionGeneratedEvent.h" // Added for DescriptionGeneratedEvent
+#include "DomainEvent.h"
 #include "IGenerateDescriptionPort.h"
 #include "IGetPlayerActionUseCase.h"
 #include "ILoadGameStatePort.h"
 #include "IRenderPort.h"
 #include "ISaveGameStatePort.h"
-#include "Player.h"
 #include "Map.h"
+#include "Player.h"
 #include <functional>
 #include <memory>
 #include <optional>
@@ -32,7 +32,6 @@ public:
   handlePlayerAction(const Port::In::PlayerActionCommand &command) override;
 
 private:
-
   std::vector<std::unique_ptr<Domain::Event::DomainEvent>> initializeGame();
   std::vector<std::unique_ptr<Domain::Event::DomainEvent>>
   processPlayerMove(int dx, int dy);
@@ -57,8 +56,9 @@ public:
   void toggleDescriptionPort();
 
 private:
-  std::unique_ptr<Domain::Event::DescriptionGeneratedEvent> createDescriptionEvent(const Port::Out::GameStateDTO& game_state, const Domain::Event::DomainEvent& event);
-
+  std::unique_ptr<Domain::Event::DescriptionGeneratedEvent>
+  createDescriptionEvent(const Port::Out::GameStateDTO &game_state,
+                         const Domain::Event::DomainEvent &event);
 };
 
 } // namespace Service

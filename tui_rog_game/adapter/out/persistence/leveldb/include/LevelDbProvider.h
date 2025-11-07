@@ -7,7 +7,7 @@
 namespace leveldb {
 class DB;
 class WriteBatch;
-}
+} // namespace leveldb
 
 namespace TuiRogGame {
 namespace Adapter {
