@@ -17,8 +17,9 @@ target_include_directories(domain_service
 
 # domain/model, port/in, port/out 모듈에 의존합니다.
 target_link_libraries(domain_service
-    PRIVATE
+    PUBLIC
         tui_rog_game::domain::model
+    PRIVATE
         tui_rog_game::domain::event
         tui_rog_game::port::in
         tui_rog_game::port::out
