@@ -6,9 +6,7 @@
 
 ## 🚀 데모
 
-```markdown
 ![Gameplay Demo](assets/gameplay_demo.gif)
-```
 
 ## ✨ 주요 기능
 
